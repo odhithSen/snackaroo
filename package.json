@@ -1,0 +1,19 @@
+{
+  "name": "snackaroo",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "backend": "npm run dev -w backend",
+    "frontend": "npm start -w frontend",
+    "start": "concurrently \"npm run backend\" \"npm run frontend\""
+  },
+  "author": "",
+  "license": "ISC",
+  "workspaces": ["backend", "frontend"],
+  "devDependencies": {
+    "concurrently": "^9.0.1"
+  }
+  
+
+}
