@@ -4,7 +4,7 @@ import config from './config'
 import app from './app'
 
 sequelize
-  .sync({ force: true })
+  .sync({ force: false })
   .then(() => {
     app.listen(config.PORT, () => {
       console.log(`App listening at http://localhost:${config.PORT}`)
