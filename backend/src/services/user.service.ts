@@ -1,16 +1,12 @@
-import { User } from '../models/user/user.interface'
+import { UserRead } from '../models/user.model'
 
-export async function getUsers(): Promise<User[]> {
+export async function getUsers(): Promise<UserRead[]> {
   return Promise.resolve([
     {
-      user_id: 1,
-      first_name: 'John',
-      last_name: 'Doe',
-    },
-    {
-      user_id: 2,
-      first_name: 'Jane',
-      last_name: 'Doe',
+      userId: 1,
+      email: 'someUser@example.com',
+      firstName: 'John',
+      lastName: 'Doe',
     },
   ])
 }
