@@ -10,10 +10,11 @@
   },
   "author": "",
   "license": "ISC",
-  "workspaces": ["backend", "frontend"],
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
   "devDependencies": {
     "concurrently": "^9.0.1"
   }
-  
-
 }
