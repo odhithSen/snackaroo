@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express'
 import jwt from 'jsonwebtoken'
 
 interface DecodedToken {
+  userEmail?: string
   permissions?: string[]
 }
 
@@ -24,9 +25,12 @@ const checkPermissions =
 
     const decoded = jwt.decode(token) as DecodedToken
     req.permissions = decoded?.permissions || []
+    req.userEmail = decoded?.userEmail || ''
 
+    // remove this console.log statement before deploying to production
     console.log('checking permissions:', permissionsArray)
     console.log('permissions:', req.permissions)
+    console.log('user email:', req.userEmail)
 
     const hasPermission = permissionsArray.some(permission => req.permissions.includes(permission))
     if (!hasPermission) {
@@ -40,6 +44,7 @@ declare global {
   namespace Express {
     interface Request {
       permissions: string[]
+      userEmail: string
     }
   }
 }
