@@ -38,10 +38,8 @@ router.post('/create', async (req: Request, res: Response, next: NextFunction) =
 
 router.post('/add-review', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    console.log('adding review...')
-
-    const { restaurant_id, reviewer_id, rating, description } = req.body
-    // TODO: write logic to extract user_id
+    const { restaurant_id, rating, description } = req.body
+    const reviewer_id = req.user.user_id
 
     const newReview: RestaurantReviewCreate = {
       restaurant_id,
