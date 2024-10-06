@@ -3,12 +3,13 @@ import { Table, Column, Model, DataType } from 'sequelize-typescript'
 
 export interface UserRead {
   user_id: number
+  first_name?: string
+  last_name?: string
   email: string
-  first_name: string
-  last_name: string
+  contact_number?: string
 }
 
-@Table({ tableName: 'users', timestamps: true, initialAutoIncrement: '10000' })
+@Table({ tableName: 'user', timestamps: true, initialAutoIncrement: '10000' })
 export class User
   extends Model<InferAttributes<User>, InferCreationAttributes<User>>
   implements UserRead
@@ -23,32 +24,37 @@ export class User
 
   @Column({
     type: DataType.STRING,
+  })
+  first_name!: string
+
+  @Column({
+    type: DataType.STRING,
+  })
+  last_name!: string
+
+  @Column({
+    type: DataType.STRING,
     allowNull: false,
   })
   email!: string
 
   @Column({
     type: DataType.STRING,
-    allowNull: false,
   })
-  first_name!: string
-
-  @Column({
-    type: DataType.STRING,
-    allowNull: false,
-  })
-  last_name!: string
+  contact_number!: string
 }
 
 export interface UserCreate {
-  email: string
+  user_id: number
   first_name: string
   last_name: string
-  user_id: number
+  email: string
+  contact_number: string
 }
 
 export interface UserUpdate {
-  email?: string
   first_name?: string
   last_name?: string
+  email?: string
+  contact_number?: string
 }

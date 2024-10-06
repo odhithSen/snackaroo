@@ -15,10 +15,11 @@ router.get('/', async (req: Request, res: Response, next: NextFunction) => {
 router.post('/create', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const tempUser: UserCreate = {
-      email: 'someoune@exampls.com',
+      user_id: 0,
       first_name: 'Jane',
       last_name: 'Doe',
-      user_id: 0,
+      email: 'someoune@exampls.com',
+      contact_number: '1234567890',
     }
 
     console.log('creating user...')

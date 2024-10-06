@@ -3,27 +3,39 @@
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable(
-      'user',
+      'restaurant',
       {
-        user_id: {
+        restaurant_id: {
           allowNull: false,
           autoIncrement: true,
           primaryKey: true,
           type: Sequelize.INTEGER,
         },
-        first_name: {
-          type: Sequelize.STRING,
-        },
-        last_name: {
-          type: Sequelize.STRING,
-        },
-        email: {
-          type: Sequelize.STRING,
+        name: {
+          type: Sequelize.STRING(255),
           allowNull: false,
           unique: true,
         },
+        thumbnail_image_url: {
+          type: Sequelize.STRING(512),
+        },
+        tag_line: {
+          type: Sequelize.STRING(255),
+        },
+        location: {
+          type: Sequelize.STRING(255),
+        },
+        address: {
+          type: Sequelize.STRING(255),
+        },
         contact_number: {
-          type: Sequelize.STRING,
+          type: Sequelize.STRING(56),
+        },
+        hygiene_rating: {
+          type: Sequelize.INTEGER,
+        },
+        notes: {
+          type: Sequelize.STRING(512),
         },
         createdAt: {
           allowNull: false,
@@ -35,11 +47,11 @@ module.exports = {
         },
       },
       {
-        initialAutoIncrement: 10000,
+        initialAutoIncrement: 20000,
       },
     )
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('users')
+    await queryInterface.dropTable('restaurant')
   },
 }
