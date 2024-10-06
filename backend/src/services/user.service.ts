@@ -13,6 +13,10 @@ export async function getUsers(): Promise<UserRead[]> {
   ])
 }
 
+export async function getUserByEmail(email: string): Promise<User | null> {
+  return await User.findOne({ where: { email } })
+}
+
 export async function addUser(user: UserCreate): Promise<User> {
   const newUser = User.build(user)
   return await newUser.save()

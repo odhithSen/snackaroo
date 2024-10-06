@@ -77,7 +77,7 @@ router.post('/add-review', async (req: Request, res: Response, next: NextFunctio
     }
 
     const createdReview = await addReview(newReview)
-    res.json({ status: 'success', data: createdReview })
+    res.status(201).json({ status: 'success', data: createdReview })
   } catch (error) {
     next(error)
   }

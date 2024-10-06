@@ -1,5 +1,7 @@
 import { Request, Response, NextFunction } from 'express'
 import jwt from 'jsonwebtoken'
+import { getUserByEmail } from '../services/user.service'
+import { User, UserRead } from '../models/user.model'
 
 interface DecodedToken {
   userEmail?: string
@@ -7,7 +9,8 @@ interface DecodedToken {
 }
 
 const checkPermissions =
-  (allowedPermissions: string | string[]) => (req: Request, res: Response, next: NextFunction) => {
+  (allowedPermissions: string | string[]) =>
+  async (req: Request, res: Response, next: NextFunction) => {
     const permissionsArray: string[] =
       typeof allowedPermissions === 'string' ? [allowedPermissions] : allowedPermissions
 
@@ -27,15 +30,16 @@ const checkPermissions =
     req.permissions = decoded?.permissions || []
     req.userEmail = decoded?.userEmail || ''
 
-    // remove this console.log statement before deploying to production
-    console.log('checking permissions:', permissionsArray)
-    console.log('permissions:', req.permissions)
-    console.log('user email:', req.userEmail)
-
     const hasPermission = permissionsArray.some(permission => req.permissions.includes(permission))
     if (!hasPermission) {
       return res.status(403).json({ message: 'Insufficient permissions' })
     }
+
+    const user: User | null = await getUserByEmail(req.userEmail)
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' })
+    }
+    req.user = user.dataValues
 
     next()
   }
@@ -45,6 +49,7 @@ declare global {
     interface Request {
       permissions: string[]
       userEmail: string
+      user: UserRead
     }
   }
 }
