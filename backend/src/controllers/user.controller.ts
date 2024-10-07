@@ -16,21 +16,55 @@ router.get('/', async (req: Request, res: Response, next: NextFunction) => {
   }
 })
 
+// TODO: need to fix the "permission" middleware. Error occurs when creating a new user (new users do't have an id yet)
 router.post('/create', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const tempUser: UserCreate = {
+    const { first_name, last_name, contact_number } = req.body
+    const email = req.userEmail
+
+    const newUser: UserCreate = {
       user_id: 0,
-      first_name: 'Jane',
-      last_name: 'Doe',
-      email: 'someoune@exampls.com',
-      contact_number: '1234567890',
+      first_name,
+      last_name,
+      email,
+      contact_number,
     }
 
-    console.log('creating user...')
-    const createdUser = await addUser(tempUser)
-    console.log('created user:')
-    console.log(createdUser)
-    res.json({ status: 'success' })
+    console.log('newUser: ', newUser)
+
+    const userCreateSchema: JSONSchemaType<UserCreate> = {
+      type: 'object',
+      properties: {
+        user_id: { type: 'integer' },
+        first_name: {
+          type: 'string',
+          minLength: 2,
+        },
+        last_name: {
+          type: 'string',
+          minLength: 2,
+        },
+        email: {
+          type: 'string',
+        },
+        contact_number: {
+          type: 'string',
+          minLength: 9,
+        },
+      },
+      required: ['user_id', 'first_name', 'last_name', 'email', 'contact_number'],
+      additionalProperties: false,
+    }
+
+    const validate = ajv.compile(userCreateSchema)
+    const valid = validate(newUser)
+    if (!valid) {
+      console.error(validate.errors)
+      throw new HttpException(400, 'Invalid request body')
+    }
+
+    const createdUser = await addUser(newUser)
+    res.status(201).json({ status: 'success', data: createdUser })
   } catch (error) {
     next(error)
   }
