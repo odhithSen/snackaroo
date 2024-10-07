@@ -28,6 +28,7 @@ export class RestaurantDishCategory
   })
   dish_category_id!: number
 
+  @Index('dish_category_name_restaurant_id_unique')
   @ForeignKey(() => Restaurant)
   @Column({
     type: DataType.INTEGER,
@@ -35,7 +36,7 @@ export class RestaurantDishCategory
   })
   restaurant_id!: number
 
-  @Index({ unique: true })
+  @Index('dish_category_name_restaurant_id_unique')
   @Column({
     type: DataType.STRING,
     allowNull: false,
