@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { CodeSnippet } from "../components/code-snippet";
 import { PageLayout } from "../components/page-layout";
 import { getAdminResource } from "../services/message.service";
 
@@ -52,7 +51,6 @@ export const AdminPage: React.FC = () => {
               </strong>
             </span>
           </p>
-          <CodeSnippet title="Admin Message" code={message} />
         </div>
       </div>
     </PageLayout>

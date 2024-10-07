@@ -7,8 +7,8 @@ export const NavBarBrand: React.FC = () => {
       <NavLink to="/">
         <img
           className="nav-bar__logo"
-          src="https://cdn.auth0.com/blog/hub/code-samples/hello-world/auth0-logo.svg"
-          alt="Auth0 shield logo"
+          src="https://consumer-component-library.roocdn.com/30.40.0/static/images/logo-teal.svg"
+          alt="Deliveroo  logo"
           width="122"
           height="36"
         />

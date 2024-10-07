@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { CodeSnippet } from "../components/code-snippet";
 import { PageLayout } from "../components/page-layout";
 import { getPublicResource } from "../services/message.service";
 
@@ -48,7 +47,6 @@ export const PublicPage: React.FC = () => {
               <strong>Any visitor can access this page.</strong>
             </span>
           </p>
-          <CodeSnippet title="Public Message" code={message} />
         </div>
       </div>
     </PageLayout>

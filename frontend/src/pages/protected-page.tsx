@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { CodeSnippet } from "../components/code-snippet";
 import { PageLayout } from "../components/page-layout";
 import { getProtectedResource } from "../services/message.service";
 
@@ -48,7 +47,6 @@ export const ProtectedPage: React.FC = () => {
               <strong>Only authenticated users can access this page.</strong>
             </span>
           </p>
-          <CodeSnippet title="Protected Message" code={message} />
         </div>
       </div>
     </PageLayout>
