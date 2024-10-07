@@ -1,6 +1,10 @@
 import { NextFunction, Request, Response, Router } from 'express'
 import HttpException from '../models/http-exception.model'
-import { getRestaurants, getRestaurantById } from '../services/public.service'
+import {
+  getRestaurants,
+  getRestaurantById,
+  getDishesByRestaurantId,
+} from '../services/public.service'
 import { PaginationQuery } from '../models/query-interface'
 import { validatePaginationQuery } from '../utils/pagination-query-validation'
 
@@ -23,6 +27,7 @@ router.get(
   },
 )
 
+//TODO: Add pagination to this endpoint
 router.get('/restaurants/:id', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const restaurantId = parseInt(req.params.id)
@@ -31,6 +36,19 @@ router.get('/restaurants/:id', async (req: Request, res: Response, next: NextFun
     }
     const restaurant = await getRestaurantById(restaurantId)
     res.json({ status: 'success', restaurant })
+  } catch (error) {
+    next(error)
+  }
+})
+
+router.get('/restaurants/:id/dishes', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const restaurantId = parseInt(req.params.id)
+    if (isNaN(restaurantId)) {
+      throw new HttpException(400, 'Invalid restaurant id')
+    }
+    const dishes = await getDishesByRestaurantId(restaurantId)
+    res.json({ status: 'success', dishes })
   } catch (error) {
     next(error)
   }
