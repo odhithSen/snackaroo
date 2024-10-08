@@ -5,6 +5,7 @@ import {
   getRestaurantById,
   getDishesByRestaurantId,
   getDishByDishId,
+  getDishCategoriesByRestaurantId,
 } from '../services/public.service'
 import { PaginationQuery } from '../models/query-interface'
 import { validatePaginationQuery } from '../utils/pagination-query-validation'
@@ -28,23 +29,26 @@ router.get(
   },
 )
 
-router.get('/restaurants/:id', async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const restaurantId = parseInt(req.params.id)
-    if (isNaN(restaurantId)) {
-      throw new HttpException(400, 'Invalid restaurant id')
+router.get(
+  '/restaurants/:restaurantId',
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const restaurantId = parseInt(req.params.restaurantId)
+      if (isNaN(restaurantId)) {
+        throw new HttpException(400, 'Invalid restaurant id')
+      }
+      const restaurant = await getRestaurantById(restaurantId)
+      res.json({ status: 'success', restaurant })
+    } catch (error) {
+      next(error)
     }
-    const restaurant = await getRestaurantById(restaurantId)
-    res.json({ status: 'success', restaurant })
-  } catch (error) {
-    next(error)
-  }
-})
+  },
+)
 
 router.get(
-  '/restaurants/:id/dishes',
+  '/restaurants/:restaurantId/dishes',
   async (
-    req: Request<{ id: string }, {}, {}, PaginationQuery>,
+    req: Request<{ restaurantId: string }, {}, {}, PaginationQuery>,
     res: Response,
     next: NextFunction,
   ) => {
@@ -53,7 +57,7 @@ router.get(
       next(paginationValues)
     } else {
       try {
-        const restaurantId = parseInt(req.params.id)
+        const restaurantId = parseInt(req.params.restaurantId)
         if (isNaN(restaurantId)) {
           throw new HttpException(400, 'Invalid restaurant id')
         }
@@ -76,6 +80,23 @@ router.get(
       }
       const dish = await getDishByDishId(dishId)
       res.json({ status: 'success', dish })
+    } catch (error) {
+      next(error)
+    }
+  },
+)
+
+// TODO: Implement this endpoint so that it will return only a list of dish category names
+router.get(
+  '/restaurants/:restaurantId/dish-categories',
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const restaurantId = parseInt(req.params.restaurantId)
+      if (isNaN(restaurantId)) {
+        throw new HttpException(400, 'Invalid restaurant id')
+      }
+      const dishCategories = await getDishCategoriesByRestaurantId(restaurantId)
+      res.json({ status: 'success', dishCategories })
     } catch (error) {
       next(error)
     }

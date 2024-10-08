@@ -1,6 +1,10 @@
 import HttpException from '../models/http-exception.model'
 import { RestaurantDishItem, RestaurantDishItemRead } from '../models/restaurant-dish-item.model'
 import { Restaurant, RestaurantRead } from '../models/restaurant.model'
+import {
+  RestaurantDishCategory,
+  RestaurantDishCategoryRead,
+} from '../models/restaurant_dish_category.model'
 import { RestaurantReview, RestaurantReviewCreate } from '../models/restaurant_review.model'
 import { PaginationValues } from '../utils/pagination-query-validation'
 
@@ -131,5 +135,39 @@ export async function getDishByDishId(
     }
     console.error('Error getting dish', error)
     throw new HttpException(500, 'Error getting dish')
+  }
+}
+
+export async function getDishCategoriesByRestaurantId(
+  restaurantId: number,
+): Promise<RestaurantDishCategoryRead[] | HttpException> {
+  try {
+    const restaurant = await Restaurant.findByPk(restaurantId)
+    if (restaurant === null) {
+      console.log('Restaurant not found')
+      throw new HttpException(404, 'Restaurant not found')
+    }
+    const dishCategories = await RestaurantDishCategory.findAll({
+      where: { restaurant_id: restaurantId },
+    })
+    if (dishCategories.length === 0) {
+      console.log('Dish categories not found')
+      throw new HttpException(404, 'Dish categories not found for the restaurant')
+    }
+    const tempDishCategories: RestaurantDishCategoryRead[] = dishCategories.map(dishCategory => {
+      return {
+        dish_category_id: dishCategory.dish_category_id,
+        restaurant_id: dishCategory.restaurant_id,
+        dish_category_name: dishCategory.dish_category_name,
+      }
+    })
+
+    return tempDishCategories
+  } catch (error) {
+    if (error instanceof HttpException) {
+      throw error
+    }
+    console.error('Error getting dish categories', error)
+    throw new HttpException(500, 'Error getting dish categories')
   }
 }
