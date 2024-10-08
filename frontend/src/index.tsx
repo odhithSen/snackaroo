@@ -4,6 +4,8 @@ import { BrowserRouter } from "react-router-dom";
 import { App } from "./app";
 import { Auth0ProviderWithNavigate } from "./auth0-provider-with-navigate";
 import "./index.css";
+import { Provider } from "react-redux";
+import { store } from "./store";
 
 const container = document.getElementById("root") as HTMLElement;
 
@@ -13,7 +15,9 @@ root.render(
   <React.StrictMode>
     <BrowserRouter>
       <Auth0ProviderWithNavigate>
-        <App />
+        <Provider store={store}>
+          <App />
+        </Provider>
       </Auth0ProviderWithNavigate>
     </BrowserRouter>
   </React.StrictMode>
