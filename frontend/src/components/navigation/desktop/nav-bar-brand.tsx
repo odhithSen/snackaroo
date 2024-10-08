@@ -1,17 +1,12 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
+import { logo } from "src/assets";
 
 export const NavBarBrand: React.FC = () => {
   return (
-    <div className="nav-bar__brand">
+    <div>
       <NavLink to="/">
-        <img
-          className="nav-bar__logo"
-          src="https://consumer-component-library.roocdn.com/30.40.0/static/images/logo-teal.svg"
-          alt="Deliveroo  logo"
-          width="122"
-          height="36"
-        />
+        <img src={logo} alt="Deliveroo logo" width="122" height="32" />
       </NavLink>
     </div>
   );

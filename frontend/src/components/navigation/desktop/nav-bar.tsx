@@ -1,13 +1,16 @@
 import React from "react";
 import { NavBarBrand } from "./nav-bar-brand";
 import { NavBarButtons } from "./nav-bar-buttons";
+import { Button } from "../../ui/button";
+import IconButton from "src/components/buttons/icon-button";
 
 export const NavBar: React.FC = () => {
   return (
-    <div className="nav-bar__container">
-      <nav className="nav-bar">
+    <div>
+      <nav>
         <NavBarBrand />
         {/* add nav bar search here */}
+        <IconButton>Search</IconButton>
         <NavBarButtons />
       </nav>
     </div>
