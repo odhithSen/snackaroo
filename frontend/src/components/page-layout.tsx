@@ -10,6 +10,7 @@ export const PageLayout: React.FC<Props> = ({ children }) => {
   return (
     <div>
       <NavBar />
+      <div className="h-[69px]" />
       <div>{children}</div>
       <PageFooter />
     </div>
