@@ -4,6 +4,7 @@ import {
   getRestaurants,
   getRestaurantById,
   getDishesByRestaurantId,
+  getDishByDishId,
 } from '../services/public.service'
 import { PaginationQuery } from '../models/query-interface'
 import { validatePaginationQuery } from '../utils/pagination-query-validation'
@@ -61,6 +62,22 @@ router.get(
       } catch (error) {
         next(error)
       }
+    }
+  },
+)
+
+router.get(
+  '/restaurants/dishes/:dishId',
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const dishId = parseInt(req.params.dishId)
+      if (isNaN(dishId)) {
+        throw new HttpException(400, 'Invalid dish id')
+      }
+      const dish = await getDishByDishId(dishId)
+      res.json({ status: 'success', dish })
+    } catch (error) {
+      next(error)
     }
   },
 )

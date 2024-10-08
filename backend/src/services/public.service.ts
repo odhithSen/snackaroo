@@ -103,3 +103,33 @@ export async function getDishesByRestaurantId(
     throw new HttpException(500, 'Error getting dishes')
   }
 }
+
+export async function getDishByDishId(
+  dishId: number,
+): Promise<RestaurantDishItemRead | HttpException> {
+  try {
+    const dish = await RestaurantDishItem.findByPk(dishId)
+    if (dish === null) {
+      console.log('Dish not found')
+      throw new HttpException(404, 'Dish not found')
+    }
+    const tempDish: RestaurantDishItemRead = {
+      dish_id: dish.dish_id,
+      restaurant_id: dish.restaurant_id,
+      dish_category_id: dish.dish_category_id,
+      thumbnail_image_url: dish.thumbnail_image_url,
+      dish_name: dish.dish_name,
+      dish_description: dish.dish_description,
+      calories: dish.calories,
+      base_price: dish.base_price,
+      ingredients: dish.ingredients,
+    }
+    return tempDish
+  } catch (error) {
+    if (error instanceof HttpException) {
+      throw error
+    }
+    console.error('Error getting dish', error)
+    throw new HttpException(500, 'Error getting dish')
+  }
+}
