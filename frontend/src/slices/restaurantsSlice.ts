@@ -4,7 +4,7 @@ import axios from "axios";
 interface Restaurant {
   restaurant_id: number;
   name: string;
-  thumbnail_image_url?: string;
+  thumbnail_image_url: string;
   tag_line: string;
   location: string;
   address: string;

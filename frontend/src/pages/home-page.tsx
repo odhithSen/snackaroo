@@ -21,31 +21,35 @@ export const HomePage: React.FC = () => {
   return (
     <PageLayout>
       <>
-        <h1>home page</h1>
+        <h1 className="m-3 text-xl font-bold">This is the Home Page</h1>
 
-        <div>
-          <h1>Posts</h1>
-          <ul>
+        <div className="flex justify-center mx-5">
+          <div className="flex flex-wrap justify-center gap-5">
             {restaurants.map((restaurant) => (
-              <li key={restaurant.restaurant_id}>{restaurant.name}</li>
+              <a href={`/restaurants/${restaurant.restaurant_id}`}>
+                <RestaurantCard
+                  key={restaurant.restaurant_id}
+                  name={restaurant.name}
+                  imageUrl={restaurant.thumbnail_image_url}
+                  rating={restaurant.hygiene_rating}
+                />
+              </a>
+            ))}
+          </div>
+        </div>
+
+        {/* <div className="flex justify-center">
+          <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 max-w-6xl">
+            {restaurants.map((restaurant) => (
+              <RestaurantCard
+                key={restaurant.restaurant_id}
+                name={restaurant.name}
+                imageUrl={restaurant.thumbnail_image_url}
+                rating={restaurant.hygiene_rating}
+              />
             ))}
           </ul>
-        </div>
-
-        <div>
-          <RestaurantCard
-            name={"Longhorn burger - Hackney"}
-            imageUrl={
-              "https://rs-menus-api.roocdn.com/images/b7edfff8-6775-4c2e-9449-064ecbea98f7/image.jpeg?width=318&height=223&auto=webp&format=jpg&fit=crop"
-            }
-            rating={0}
-            isNew={false}
-            distance={3.5}
-            deliveryFee={200}
-            minDeliveryTime={40}
-            maxDeliveryTime={50}
-          />
-        </div>
+        </div> */}
 
         <p className="block mt-52">
           Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quaerat illo
