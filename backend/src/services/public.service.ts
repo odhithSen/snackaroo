@@ -5,7 +5,6 @@ import {
   RestaurantDishCategory,
   RestaurantDishCategoryRead,
 } from '../models/restaurant_dish_category.model'
-import { RestaurantReview, RestaurantReviewCreate } from '../models/restaurant_review.model'
 import { PaginationValues } from '../utils/pagination-query-validation'
 
 export async function getRestaurantById(id: number): Promise<RestaurantRead | HttpException> {
@@ -105,6 +104,57 @@ export async function getDishesByRestaurantId(
     }
     console.error('Error getting dishes', error)
     throw new HttpException(500, 'Error getting dishes')
+  }
+}
+
+export async function getDishesByCategory(
+  id: number,
+  paginationValues: PaginationValues,
+  category: string,
+): Promise<RestaurantDishItemRead[] | HttpException> {
+  try {
+    const restaurant = await Restaurant.findByPk(id)
+    if (restaurant === null) {
+      console.log('Restaurant not found')
+      throw new HttpException(404, 'Restaurant not found')
+    }
+    const dishCategory = await RestaurantDishCategory.findOne({
+      where: { restaurant_id: id, dish_category_name: category },
+    })
+    if (dishCategory === null) {
+      console.log('Dish category not found')
+      throw new HttpException(404, 'Dish category not found for the restaurant')
+    }
+    const dishes = await RestaurantDishItem.findAll({
+      where: { restaurant_id: id, dish_category_id: dishCategory.dish_category_id },
+      limit: paginationValues.limit,
+      offset: (paginationValues.page - 1) * paginationValues.limit,
+    })
+    if (dishes.length === 0) {
+      console.log('Dishes not found')
+      throw new HttpException(404, 'Dishes not found for the category')
+    }
+    const tempDishes: RestaurantDishItemRead[] = dishes.map(dish => {
+      return {
+        dish_id: dish.dish_id,
+        restaurant_id: dish.restaurant_id,
+        dish_category_id: dish.dish_category_id,
+        thumbnail_image_url: dish.thumbnail_image_url,
+        dish_name: dish.dish_name,
+        dish_description: dish.dish_description,
+        calories: dish.calories,
+        base_price: dish.base_price,
+        ingredients: dish.ingredients,
+      }
+    })
+
+    return tempDishes
+  } catch (error) {
+    if (error instanceof HttpException) {
+      throw error
+    }
+    console.error('Error getting dishes by category', error)
+    throw new HttpException(500, 'Error getting dishes by category')
   }
 }
 

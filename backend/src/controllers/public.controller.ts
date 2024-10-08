@@ -6,6 +6,7 @@ import {
   getDishesByRestaurantId,
   getDishByDishId,
   getDishCategoriesByRestaurantId,
+  getDishesByCategory,
 } from '../services/public.service'
 import { PaginationQuery } from '../models/query-interface'
 import { validatePaginationQuery } from '../utils/pagination-query-validation'
@@ -48,11 +49,13 @@ router.get(
 router.get(
   '/restaurants/:restaurantId/dishes',
   async (
-    req: Request<{ restaurantId: string }, {}, {}, PaginationQuery>,
+    req: Request<{ restaurantId: string }, {}, {}, PaginationQuery & { category?: string }>,
     res: Response,
     next: NextFunction,
   ) => {
     const paginationValues = validatePaginationQuery(req.query)
+    const { category } = req.query
+
     if (paginationValues instanceof HttpException) {
       next(paginationValues)
     } else {
@@ -61,7 +64,14 @@ router.get(
         if (isNaN(restaurantId)) {
           throw new HttpException(400, 'Invalid restaurant id')
         }
-        const dishes = await getDishesByRestaurantId(restaurantId, paginationValues)
+        let dishes
+
+        if (category) {
+          dishes = await getDishesByCategory(restaurantId, paginationValues, category)
+        } else {
+          dishes = await getDishesByRestaurantId(restaurantId, paginationValues)
+        }
+
         res.json({ status: 'success', dishes })
       } catch (error) {
         next(error)
@@ -86,7 +96,7 @@ router.get(
   },
 )
 
-// TODO: Implement this endpoint so that it will return only a list of dish category names
+// TODO: Implement this endpoint so that it will return only a list of dish category names?
 router.get(
   '/restaurants/:restaurantId/dish-categories',
   async (req: Request, res: Response, next: NextFunction) => {
