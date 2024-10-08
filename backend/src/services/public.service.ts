@@ -63,6 +63,7 @@ export async function getRestaurants(
 
 export async function getDishesByRestaurantId(
   id: number,
+  paginationValues: PaginationValues,
 ): Promise<RestaurantDishItemRead[] | HttpException> {
   try {
     const restaurant = await Restaurant.findByPk(id)
@@ -72,6 +73,8 @@ export async function getDishesByRestaurantId(
     }
     const dishes = await RestaurantDishItem.findAll({
       where: { restaurant_id: id },
+      limit: paginationValues.limit,
+      offset: (paginationValues.page - 1) * paginationValues.limit,
     })
     if (dishes.length === 0) {
       console.log('Dishes not found')
@@ -100,52 +103,3 @@ export async function getDishesByRestaurantId(
     throw new HttpException(500, 'Error getting dishes')
   }
 }
-
-// export async function getRestaurants(
-//   limit: number,
-//   offset: number,
-// ): Promise<RestaurantRead[] | HttpException> {
-//   try {
-//     const restaurants = await Restaurant.findAll({
-//       limit: limit,
-//       offset: offset,
-//     })
-//     const tempRestaurants: RestaurantRead[] = restaurants.map(restaurant => {
-//       return {
-//         restaurant_id: restaurant.restaurant_id,
-//         name: restaurant.name,
-//         thumbnail_image_url: restaurant.thumbnail_image_url,
-//         tag_line: restaurant.tag_line,
-//         location: restaurant.location,
-//         address: restaurant.address,
-//         contact_number: restaurant.contact_number,
-//         hygiene_rating: restaurant.hygiene_rating,
-//         notes: restaurant.notes,
-//       }
-//     })
-//     return tempRestaurants
-//   } catch (error) {
-//     console.error('Error getting restaurants', error)
-//     throw new HttpException(500, 'Error getting restaurants')
-//   }
-// }
-
-// export async function addReview(
-//   review: RestaurantReviewCreate,
-// ): Promise<RestaurantReview | HttpException> {
-//   try {
-//     const newReview = RestaurantReview.build(review)
-//     return await newReview.save()
-//   } catch (error) {
-//     console.error('Error saving review', error)
-//     // @ts-ignore
-//     if (error.name === 'SequelizeUniqueConstraintError') {
-//       throw new HttpException(400, 'Review already exists')
-//       // @ts-ignore
-//     } else if (error.name === 'ValidationError') {
-//       throw new HttpException(400, 'Invalid review')
-//     } else {
-//       throw new HttpException(500, 'Error saving review')
-//     }
-//   }
-// }

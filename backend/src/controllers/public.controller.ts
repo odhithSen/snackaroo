@@ -27,7 +27,6 @@ router.get(
   },
 )
 
-//TODO: Add pagination to this endpoint
 router.get('/restaurants/:id', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const restaurantId = parseInt(req.params.id)
@@ -41,17 +40,29 @@ router.get('/restaurants/:id', async (req: Request, res: Response, next: NextFun
   }
 })
 
-router.get('/restaurants/:id/dishes', async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const restaurantId = parseInt(req.params.id)
-    if (isNaN(restaurantId)) {
-      throw new HttpException(400, 'Invalid restaurant id')
+router.get(
+  '/restaurants/:id/dishes',
+  async (
+    req: Request<{ id: string }, {}, {}, PaginationQuery>,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    const paginationValues = validatePaginationQuery(req.query)
+    if (paginationValues instanceof HttpException) {
+      next(paginationValues)
+    } else {
+      try {
+        const restaurantId = parseInt(req.params.id)
+        if (isNaN(restaurantId)) {
+          throw new HttpException(400, 'Invalid restaurant id')
+        }
+        const dishes = await getDishesByRestaurantId(restaurantId, paginationValues)
+        res.json({ status: 'success', dishes })
+      } catch (error) {
+        next(error)
+      }
     }
-    const dishes = await getDishesByRestaurantId(restaurantId)
-    res.json({ status: 'success', dishes })
-  } catch (error) {
-    next(error)
-  }
-})
+  },
+)
 
 export default router
