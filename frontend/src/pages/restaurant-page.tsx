@@ -10,6 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "src/components/ui/dropdown-menu";
 import DishCard from "src/components/cards/dish-card";
+import Basket from "src/components/basket";
 
 //Mock data
 type Category = {
@@ -243,6 +244,8 @@ export const RestaurantPage: React.FC = () => {
               calories={450}
             />
           </div>
+
+          <Basket />
 
           {/* Mock content for demonstration */}
           {categories.map((category) => (
