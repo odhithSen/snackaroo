@@ -38,19 +38,6 @@ export const HomePage: React.FC = () => {
           </div>
         </div>
 
-        {/* <div className="flex justify-center">
-          <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 max-w-6xl">
-            {restaurants.map((restaurant) => (
-              <RestaurantCard
-                key={restaurant.restaurant_id}
-                name={restaurant.name}
-                imageUrl={restaurant.thumbnail_image_url}
-                rating={restaurant.hygiene_rating}
-              />
-            ))}
-          </ul>
-        </div> */}
-
         <p className="block mt-52">
           Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quaerat illo
           fugiat libero natus tempora, itaque accusantium id repellendus quo

@@ -1,5 +1,5 @@
-import React from "react";
 import { Facebook, Twitter, Instagram } from "lucide-react";
+import { appleStore, googlePlay } from "src/assets";
 
 const footerSections = [
   {
@@ -48,7 +48,7 @@ export function PageFooter() {
               {section.links.map((link) => (
                 <li key={link}>
                   <a
-                    href="#"
+                    href="./"
                     className="text-gray-300 hover:text-teal-500 transition-colors"
                   >
                     {link}
@@ -63,23 +63,19 @@ export function PageFooter() {
           <h2 className="text-lg font-semibold mb-4">
             Take Deliveroo with you
           </h2>
-          <div className="space-y-2">
-            <a href="#" className="inline-block">
+          <div className="flex flex-col gap-4">
+            <a href="./" className="inline-block h-10 w-32">
               <img
-                src="/placeholder.svg?height=40&width=135"
+                src={appleStore}
                 alt="Download on the App Store"
-                width={135}
-                height={40}
-                className="rounded-md"
+                className="rounded-md w-full h-full"
               />
             </a>
-            <a href="#" className="inline-block">
+            <a href="./" className="inline-block h-10 w-32">
               <img
-                src="/placeholder.svg?height=40&width=135"
+                src={googlePlay}
                 alt="Get it on Google Play"
-                width={135}
-                height={40}
-                className="rounded-md"
+                className="rounded-md w-full h-full"
               />
             </a>
           </div>
@@ -88,15 +84,24 @@ export function PageFooter() {
 
       <div className="mt-8 pt-8 border-t border-gray-700 flex flex-col md:flex-row justify-between items-center">
         <div className="flex space-x-4 mb-4 md:mb-0">
-          <a href="#" className="text-gray-400 hover:text-white">
+          <a
+            href="https://www.facebook.com/"
+            className="text-gray-400 hover:text-white"
+          >
             <Facebook size={24} />
             <span className="sr-only">Facebook</span>
           </a>
-          <a href="#" className="text-gray-400 hover:text-white">
+          <a
+            href="https://www.twitter.com/"
+            className="text-gray-400 hover:text-white"
+          >
             <Twitter size={24} />
             <span className="sr-only">Twitter</span>
           </a>
-          <a href="#" className="text-gray-400 hover:text-white">
+          <a
+            href="https://www.instagram.com/"
+            className="text-gray-400 hover:text-white"
+          >
             <Instagram size={24} />
             <span className="sr-only">Instagram</span>
           </a>
