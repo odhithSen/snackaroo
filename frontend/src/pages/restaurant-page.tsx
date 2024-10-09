@@ -9,6 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "src/components/ui/dropdown-menu";
+import DishCard from "src/components/cards/dish-card";
 
 //Mock data
 type Category = {
@@ -216,6 +217,30 @@ export const RestaurantPage: React.FC = () => {
               </DropdownMenu>
             )}
           </nav>
+
+          <div className="my-5">
+            <DishCard
+              name="Chicken Caesar Salad"
+              description="Romaine lettuce, grilled chicken, croutons, parmesan cheese, Caesar dressing"
+              price={7.99}
+              imageUrl="https://loremflickr.com/320/320/food,restaurant?lock=1568372147159672"
+              isAvailable={true}
+              onAddToBasket={() => console.log("Add to basket")}
+              calories={450}
+            />
+          </div>
+
+          <div className="my-5">
+            <DishCard
+              name="Chicken Caesar Salad"
+              description="Romaine lettuce, grilled chicken, croutons, parmesan cheese, Caesar dressing"
+              price={7.99}
+              imageUrl="https://loremflickr.com/320/320/food,restaurant?lock=1568372147159672"
+              isAvailable={false}
+              onAddToBasket={() => console.log("Add to basket")}
+              calories={450}
+            />
+          </div>
 
           {/* Mock content for demonstration */}
           {categories.map((category) => (
