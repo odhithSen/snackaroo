@@ -225,6 +225,7 @@ export const RestaurantPage: React.FC = () => {
               price={7.99}
               imageUrl="https://loremflickr.com/320/320/food,restaurant?lock=1568372147159672"
               isAvailable={true}
+              ingredients="Contains sulphur dioxide/sulphites, gluten, soybeans"
               onAddToBasket={() => console.log("Add to basket")}
               calories={450}
             />
@@ -237,6 +238,7 @@ export const RestaurantPage: React.FC = () => {
               price={7.99}
               imageUrl="https://loremflickr.com/320/320/food,restaurant?lock=1568372147159672"
               isAvailable={false}
+              ingredients="Contains known allergens"
               onAddToBasket={() => console.log("Add to basket")}
               calories={450}
             />
