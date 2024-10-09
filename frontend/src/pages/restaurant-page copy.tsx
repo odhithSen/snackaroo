@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import { PageLayout } from "../components/page-layout";
 import { ArrowLeft, ChevronRight, ChevronDown, Info, Star } from "lucide-react";
 import { Button } from "src/components/ui/button";
@@ -6,7 +6,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "src/components/ui/dropdown-menu";
 
@@ -29,7 +28,6 @@ const categories: Category[] = [
 ];
 
 export const RestaurantPage: React.FC = () => {
-  // stuff for category bar
   const [visibleCategories, setVisibleCategories] =
     useState<Category[]>(categories);
   const [hiddenCategories, setHiddenCategories] = useState<Category[]>([]);
@@ -37,6 +35,7 @@ export const RestaurantPage: React.FC = () => {
   const navRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // Category resizing logic
   useEffect(() => {
     const updateCategories = () => {
       if (containerRef.current) {
@@ -45,16 +44,19 @@ export const RestaurantPage: React.FC = () => {
         const visible: Category[] = [];
         const hidden: Category[] = [];
 
-        categories.forEach((category) => {
-          const categoryElement = document.getElementById(category.id);
-          if (categoryElement) {
-            const categoryWidth = categoryElement.offsetWidth;
-            if (visibleWidth + categoryWidth + 300 < containerWidth) {
-              // 100px buffer for "More" button
-              visible.push(category);
+        // Batch DOM access to improve performance
+        const categoryElements = categories.map((category) =>
+          document.getElementById(category.id)
+        );
+
+        categoryElements.forEach((element, index) => {
+          if (element) {
+            const categoryWidth = element.offsetWidth;
+            if (visibleWidth + categoryWidth + 100 < containerWidth) {
+              visible.push(categories[index]);
               visibleWidth += categoryWidth;
             } else {
-              hidden.push(category);
+              hidden.push(categories[index]);
             }
           }
         });
@@ -69,10 +71,10 @@ export const RestaurantPage: React.FC = () => {
     return () => window.removeEventListener("resize", updateCategories);
   }, []);
 
+  // Scroll handling
   useEffect(() => {
     const handleScroll = () => {
-      const scrollPosition = window.scrollY + 100; // 100px offset for nav height
-
+      const scrollPosition = window.scrollY + 100; // Offset for nav height
       categories.forEach((category) => {
         const element = document.getElementById(`section-${category.id}`);
         if (element) {
@@ -88,12 +90,13 @@ export const RestaurantPage: React.FC = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const handleCategoryClick = (categoryId: string) => {
+  // Optimized handler for category click
+  const handleCategoryClick = useCallback((categoryId: string) => {
     const element = document.getElementById(`section-${categoryId}`);
     if (element) {
       element.scrollIntoView({ behavior: "smooth" });
     }
-  };
+  }, []);
 
   return (
     <PageLayout>
@@ -120,7 +123,7 @@ export const RestaurantPage: React.FC = () => {
               </div>
 
               <div className="w-full md:w-1/2">
-                <h1 className="text-2xl md:text-4xl font-bold mb-2">
+                <h1 className="text-2xl md:text-3xl font-bold mb-2">
                   Tossed - St Martin's Lane
                 </h1>
                 <p className="text-gray-600 mb-2">Chicken · Salads · Healthy</p>
@@ -171,46 +174,41 @@ export const RestaurantPage: React.FC = () => {
         >
           <nav
             ref={navRef}
-            className="flex items-center justify-start border-y border-[#eaeaea] shadow-sm overflow-x-auto px-4 py-5"
+            className="flex items-center justify-start overflow-x-auto px-4 py-2"
           >
             {visibleCategories.map((category) => (
               <Button
                 key={category.id}
                 id={category.id}
                 variant={activeCategory === category.id ? "default" : "ghost"}
-                className={`mx-2 px-4 py-1 h-auto text-sm font-normal rounded-2xl ${
+                className={`px-4 py-2 h-auto text-sm font-medium ${
                   activeCategory === category.id
                     ? "bg-teal-500 text-white hover:bg-teal-600"
-                    : "text-teal-500 hover:bg-gray-100 hover:text-teal-500"
+                    : "text-gray-600 hover:bg-gray-100"
                 }`}
                 onClick={() => handleCategoryClick(category.id)}
               >
                 {category.name}
               </Button>
             ))}
-
             {hiddenCategories.length > 0 && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant="ghost"
-                    className="ml-16 px-4 py-1 h-auto rounded-2xl text-sm font-normal text-teal-500 hover:bg-gray-100 hover:text-teal-500"
+                    className="px-4 py-2 h-auto text-sm font-medium text-gray-600 hover:bg-gray-100"
                   >
-                    More <ChevronDown className="ml-2 h-5 w-5 text-teal-500" />
+                    More <ChevronDown className="ml-1 h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
                   {hiddenCategories.map((category) => (
-                    <>
-                      <DropdownMenuItem
-                        key={category.id}
-                        onClick={() => handleCategoryClick(category.id)}
-                        className="px-4 py-3 font-normal"
-                      >
-                        {category.name}
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                    </>
+                    <DropdownMenuItem
+                      key={category.id}
+                      onClick={() => handleCategoryClick(category.id)}
+                    >
+                      {category.name}
+                    </DropdownMenuItem>
                   ))}
                 </DropdownMenuContent>
               </DropdownMenu>
