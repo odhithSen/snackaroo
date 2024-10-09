@@ -1,11 +1,12 @@
 import React from "react";
+import { spinner } from "src/assets";
 
 export const PageLoader: React.FC = () => {
-  const loadingImg = "https://cdn.auth0.com/blog/hello-auth0/loader.svg";
-
   return (
-    <div className="loader">
-      <img src={loadingImg} alt="Loading..." />
+    <div className="flex items-center justify-center h-screen">
+      <div className="h-20 w-20 animate-spin">
+        <img src={spinner} alt="Loading..." />
+      </div>
     </div>
   );
 };

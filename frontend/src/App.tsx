@@ -9,7 +9,6 @@ import { HomePage } from "./pages/home-page";
 import { NotFoundPage } from "./pages/not-found-page";
 import { ProfilePage } from "./pages/profile-page";
 import { ProtectedPage } from "./pages/protected-page";
-import { PublicPage } from "./pages/public-page";
 import { RestaurantPage } from "./pages/restaurant-page";
 
 export const App: React.FC = () => {
@@ -25,18 +24,17 @@ export const App: React.FC = () => {
   return (
     <Routes>
       <Route path="/" element={<HomePage />} />
-      <Route path="/restaurants/101" element={<RestaurantPage />} />
+      <Route path="/restaurant/:restaurantId" element={<RestaurantPage />} />
       <Route
         path="/profile"
         element={<AuthenticationGuard component={ProfilePage} />}
       />
-      <Route path="/public" element={<PublicPage />} />
       <Route
-        path="/protected"
+        path="/restaurant-admin"
         element={<AuthenticationGuard component={ProtectedPage} />}
       />
       <Route
-        path="/admin"
+        path="/snackaroo-admin"
         element={<AuthenticationGuard component={AdminPage} />}
       />
       <Route path="/callback" element={<CallbackPage />} />

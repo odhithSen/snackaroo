@@ -11,6 +11,7 @@ import {
 } from "src/components/ui/dropdown-menu";
 import DishCard from "src/components/cards/dish-card";
 import Basket from "src/components/basket";
+import { useParams } from "react-router-dom";
 
 //Mock data
 type Category = {
@@ -38,6 +39,9 @@ export const RestaurantPage: React.FC = () => {
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const navRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const { restaurantId } = useParams();
+
+  console.log("restaurantId", restaurantId);
 
   useEffect(() => {
     const updateCategories = () => {

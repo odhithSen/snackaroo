@@ -2,9 +2,31 @@ import React, { useState } from "react";
 import { NavBarBrand } from "./nav-bar-brand";
 import IconButton from "src/components/buttons/icon-button";
 import { Input } from "src/components/ui/input";
-import { Search, User } from "lucide-react";
+import { Search, User, LogOut } from "lucide-react";
+import { useAuth0 } from "@auth0/auth0-react";
 
 export const NavBar: React.FC = () => {
+  const { loginWithRedirect, logout, isAuthenticated } = useAuth0();
+
+  const handleLogin = async () => {
+    await loginWithRedirect({
+      appState: {
+        returnTo: window.location.pathname, //"/profile",
+      },
+      authorizationParams: {
+        prompt: "login",
+      },
+    });
+  };
+
+  const handleLogout = () => {
+    logout({
+      logoutParams: {
+        returnTo: window.location.origin,
+      },
+    });
+  };
+
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   const handleSearchSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -32,7 +54,20 @@ export const NavBar: React.FC = () => {
         </div>
 
         <div className="flex">
-          <IconButton className="mr-2">Sign up or log in</IconButton>
+          {!isAuthenticated ? (
+            <IconButton className="mr-2" onClick={handleLogin}>
+              Sign up or log in
+            </IconButton>
+          ) : (
+            <IconButton
+              icon={<LogOut className="h-4 w-4" />}
+              className="mr-2"
+              onClick={handleLogout}
+            >
+              Logout
+            </IconButton>
+          )}
+
           <IconButton icon={<User className="h-4 w-4" />}>Account</IconButton>
         </div>
       </nav>
