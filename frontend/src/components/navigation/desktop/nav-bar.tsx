@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { NavBarBrand } from "./nav-bar-brand";
-import { NavBarButtons } from "./nav-bar-buttons";
 import IconButton from "src/components/buttons/icon-button";
 import { Input } from "src/components/ui/input";
 import { Search, User } from "lucide-react";
@@ -36,7 +35,6 @@ export const NavBar: React.FC = () => {
           <IconButton className="mr-2">Sign up or log in</IconButton>
           <IconButton icon={<User className="h-4 w-4" />}>Account</IconButton>
         </div>
-        {/* <NavBarButtons /> */}
       </nav>
     </div>
   );
