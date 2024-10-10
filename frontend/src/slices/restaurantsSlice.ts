@@ -36,7 +36,6 @@ export const fetchRestaurants = createAsyncThunk(
     const response = await axios.get<RestaurantsResponse>(
       "http://localhost:8080/api/public/restaurants?page=1&limit=10"
     );
-    console.log("response.data" + response.data.restaurants);
     return response.data.restaurants;
   }
 );

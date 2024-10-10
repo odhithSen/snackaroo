@@ -15,47 +15,64 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "src/store";
 import { fetchRestaurant } from "src/slices/restaurantSlice";
-
-//Mock data
-type Category = {
-  id: string;
-  name: string;
-};
-
-const categories: Category[] = [
-  { id: "platters", name: "Platters" },
-  { id: "create-your-own", name: "Create your own" },
-  { id: "salads", name: "Salads" },
-  { id: "gym-food", name: "Gym food" },
-  { id: "hot-power-bowls", name: "Hot Power Bowls" },
-  { id: "rainbow-wraps", name: "Rainbow Wraps" },
-  { id: "vegan-menu", name: "Vegan Menu" },
-  { id: "snacks-and-sides", name: "Snacks & Sides" },
-  { id: "yoghurt-and-fruit", name: "Yoghurt & fruit" },
-];
+import {
+  fetchDishCategories,
+  RestaurantDishCategory,
+} from "src/slices/dishCategoriesSlice";
 
 export const RestaurantPage: React.FC = () => {
   const navigate = useNavigate();
   const { restaurantId } = useParams();
 
   // stuff for category bar
-  const [visibleCategories, setVisibleCategories] =
-    useState<Category[]>(categories);
-  const [hiddenCategories, setHiddenCategories] = useState<Category[]>([]);
+  const [visibleCategories, setVisibleCategories] = useState<
+    RestaurantDishCategory[]
+  >([]);
+  const [hiddenCategories, setHiddenCategories] = useState<
+    RestaurantDishCategory[]
+  >([]);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const navRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  const dispatch = useDispatch<AppDispatch>();
+
+  const restaurant = useSelector(
+    (state: RootState) => state.restaurant.restaurant
+  );
+  const restaurantLoading = useSelector(
+    (state: RootState) => state.restaurant.loading
+  );
+  const restaurantError = useSelector(
+    (state: RootState) => state.restaurant.error
+  );
+
+  const dishCategories = useSelector(
+    (state: RootState) => state.dishCategories.dish_categories
+  );
+  const dishCategoriesLoading = useSelector(
+    (state: RootState) => state.dishCategories.loading
+  );
+  const dishCategoriesError = useSelector(
+    (state: RootState) => state.dishCategories.error
+  );
+
   useEffect(() => {
+    if (!dishCategories) {
+      return;
+    }
+    console.log("use effect ran:", dishCategories);
     const updateCategories = () => {
       if (containerRef.current) {
         const containerWidth = containerRef.current.offsetWidth;
         let visibleWidth = 0;
-        const visible: Category[] = [];
-        const hidden: Category[] = [];
+        const visible: RestaurantDishCategory[] = [];
+        const hidden: RestaurantDishCategory[] = [];
 
-        categories.forEach((category) => {
-          const categoryElement = document.getElementById(category.id);
+        dishCategories.forEach((category) => {
+          const categoryElement = document.getElementById(
+            category.dish_category_id.toString()
+          );
           if (categoryElement) {
             const categoryWidth = categoryElement.offsetWidth;
             if (visibleWidth + categoryWidth + 300 < containerWidth) {
@@ -77,7 +94,7 @@ export const RestaurantPage: React.FC = () => {
     console.log("resize use effect ran");
     window.addEventListener("resize", updateCategories);
     return () => window.removeEventListener("resize", updateCategories);
-  }, []);
+  }, [dishCategories]);
 
   const handleCategoryClick = (categoryId: string) => {
     const element = document.getElementById(`section-${categoryId}`);
@@ -87,25 +104,31 @@ export const RestaurantPage: React.FC = () => {
     }
   };
 
-  const dispatch = useDispatch<AppDispatch>();
-  const { restaurant, loading, error } = useSelector(
-    (state: RootState) => state.restaurant
-  );
-
   useEffect(() => {
     dispatch(fetchRestaurant({ restaurantID: Number(restaurantId) }));
   }, [dispatch, restaurantId]);
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error: {error}</p>;
+  useEffect(() => {
+    dispatch(fetchDishCategories({ restaurantID: Number(restaurantId) }));
+  }, [dispatch, restaurantId]);
+
+  if (restaurantLoading || dishCategoriesLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (restaurantError) {
+    return <div>Error fetching restaurant: {restaurantError}</div>;
+  }
+
+  if (dishCategoriesError) {
+    return <div>Error fetching categories: {dishCategoriesError}</div>;
+  }
 
   return (
     <PageLayout>
       <>
         {/* remove this before moving to production */}
         <h1 className="m-3 text-xl font-bold">This is the restaurant page</h1>
-
-        <h1>{restaurant ? restaurant.name : "name"}</h1>
 
         {/* Restaurant page hero section */}
         <div className="w-full bg-white">
@@ -131,10 +154,11 @@ export const RestaurantPage: React.FC = () => {
 
               <div className="w-full md:w-1/2">
                 <h1 className="text-2xl md:text-4xl font-bold mb-2">
-                  Tossed - St Martin's Lane
+                  {restaurant?.name}
                 </h1>
-                <p className="text-gray-600 mb-2">Chicken · Salads · Healthy</p>
+                <p className="text-gray-600 mb-2">{restaurant?.tag_line}</p>
                 <p className="text-sm text-gray-500 mb-4">
+                  {/* Can render the open time using restaurant open time api */}
                   0.20 miles away · Opens at 11:00 · £7.00 minimum · £0.49
                   delivery
                 </p>
@@ -153,6 +177,7 @@ export const RestaurantPage: React.FC = () => {
                   </p>
                 </div>
 
+                {/* Can render the reviews and rating from thr reviews api */}
                 <div className="mb-4">
                   <button className="w-full flex justify-start items-center">
                     <div className="flex items-center">
@@ -183,19 +208,25 @@ export const RestaurantPage: React.FC = () => {
             ref={navRef}
             className="flex items-center justify-start border-y border-[#eaeaea] shadow-sm overflow-x-auto px-4 py-5"
           >
-            {visibleCategories.map((category) => (
+            {visibleCategories?.map((category) => (
               <Button
-                key={category.id}
-                id={category.id}
-                variant={activeCategory === category.id ? "default" : "ghost"}
+                key={category.dish_category_id}
+                id={category.dish_category_id.toString()}
+                variant={
+                  activeCategory === category.dish_category_id.toString()
+                    ? "default"
+                    : "ghost"
+                }
                 className={`mx-2 px-4 py-1 h-auto text-sm font-normal rounded-2xl ${
-                  activeCategory === category.id
+                  activeCategory === category.dish_category_id.toString()
                     ? "bg-teal-500 text-white hover:bg-teal-600"
                     : "text-teal-500 hover:bg-gray-100 hover:text-teal-500"
                 }`}
-                onClick={() => handleCategoryClick(category.id)}
+                onClick={() =>
+                  handleCategoryClick(category.dish_category_id.toString())
+                }
               >
-                {category.name}
+                {category.dish_category_name}
               </Button>
             ))}
 
@@ -213,11 +244,15 @@ export const RestaurantPage: React.FC = () => {
                   {hiddenCategories.map((category) => (
                     <>
                       <DropdownMenuItem
-                        key={category.id}
-                        onClick={() => handleCategoryClick(category.id)}
+                        key={category.dish_category_id}
+                        onClick={() =>
+                          handleCategoryClick(
+                            category.dish_category_id.toString()
+                          )
+                        }
                         className="px-4 py-3 font-normal"
                       >
-                        {category.name}
+                        {category.dish_category_name}
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
                     </>
@@ -257,7 +292,7 @@ export const RestaurantPage: React.FC = () => {
           <Basket />
 
           {/* Mock content for demonstration */}
-          {categories.map((category) => (
+          {/* {categories.map((category) => (
             <div
               key={category.id}
               id={`section-${category.id}`}
@@ -266,7 +301,7 @@ export const RestaurantPage: React.FC = () => {
               <h2 className="text-2xl font-bold mb-4">{category.name}</h2>
               <p>This is the content for the {category.name} section.</p>
             </div>
-          ))}
+          ))} */}
         </div>
       </>
     </PageLayout>
