@@ -86,12 +86,9 @@ export const RestaurantPage: React.FC = () => {
   return (
     <PageLayout>
       <>
-        {/* remove this before moving to production */}
-        <h1 className="m-3 text-xl font-bold">This is the restaurant page</h1>
-
         {/* Restaurant page hero section */}
         <div className="w-full bg-white">
-          <div className="max-w-[1775px] mx-auto p-6">
+          <div className="mx-auto p-6">
             <button
               className="text-teal-500 flex items-center mb-4"
               onClick={() => navigate(-1)}
@@ -100,58 +97,60 @@ export const RestaurantPage: React.FC = () => {
               Back
             </button>
 
-            <div className="flex flex-col md:flex-row md:space-x-6">
-              <div className="w-full md:w-1/2 mb-4 md:mb-0">
-                <div className="relative w-full h-48 md:h-full">
-                  <img
-                    src="https://loremflickr.com/320/320/food,restaurant?lock=1568372147159672"
-                    alt="Tossed salad bowls"
-                    className="rounded-lg w-full h-full max-w-80"
-                  />
+            <div className="w-full">
+              <div className="flex flex-col w-full md:w-fit md:flex-row">
+                <div className="grow w-full mb-4 md:mb-0">
+                  <div className="relative w-full h-72 md:h-80">
+                    <img
+                      src={restaurant?.thumbnail_image_url}
+                      alt={restaurant?.name + " thumbnail"}
+                      className="rounded-lg w-full h-full object-cover"
+                    />
+                  </div>
                 </div>
-              </div>
 
-              <div className="w-full md:w-1/2">
-                <h1 className="text-2xl md:text-4xl font-bold mb-2">
-                  {restaurant?.name}
-                </h1>
-                <p className="text-gray-600 mb-2">{restaurant?.tag_line}</p>
-                <p className="text-sm text-gray-500 mb-4">
-                  {/* Can render the open time using restaurant open time api */}
-                  0.20 miles away · Opens at 11:00 · £7.00 minimum · £0.49
-                  delivery
-                </p>
-                <div className="py-3 mb-4">
-                  <button className="w-full flex justify-start items-center text-left">
-                    <div className="flex items-center">
-                      <div className="w-6 h-6 flex items-center justify-center mr-3">
-                        <Info color="#abadad" />
+                <div className="grow w-full md:ml-8">
+                  <h1 className="text-2xl md:text-4xl font-bold mb-2">
+                    {restaurant?.name}
+                  </h1>
+                  <p className="text-gray-600 mb-2">{restaurant?.tag_line}</p>
+                  <p className="text-sm text-gray-500 mb-4">
+                    {/* Can render the open time using restaurant open time api */}
+                    0.20 miles away · Opens at 11:00 · £7.00 minimum · £0.49
+                    delivery
+                  </p>
+                  <div className="py-3 mb-4">
+                    <button className="w-full flex justify-start items-center text-left">
+                      <div className="flex items-center">
+                        <div className="w-6 h-6 flex items-center justify-center mr-3">
+                          <Info color="#abadad" />
+                        </div>
+                        <span>Info</span>
                       </div>
-                      <span>Info</span>
-                    </div>
-                    <ChevronRight className="w-5 h-5 text-teal-500 ml-52" />
-                  </button>
-                  <p className="text-sm text-gray-500 mt-1 ml-9">
-                    Map, allergens and hygiene rating
-                  </p>
-                </div>
+                      <ChevronRight className="w-5 h-5 text-teal-500 ml-52" />
+                    </button>
+                    <p className="text-sm text-gray-500 mt-1 ml-9">
+                      Map, allergens and hygiene rating
+                    </p>
+                  </div>
 
-                {/* Can render the reviews and rating from thr reviews api */}
-                <div className="mb-4">
-                  <button className="w-full flex justify-start items-center">
-                    <div className="flex items-center">
-                      <Star
-                        fill="#4d7c1b"
-                        strokeWidth={0}
-                        className="h-6 w-6 mr-2"
-                      />
-                      <span className="text-[#4d7c1b]">4.7 Excellent</span>
-                    </div>
-                    <ChevronRight className="w-5 h-5 text-teal-500 ml-24" />
-                  </button>
-                  <p className="text-sm text-gray-500 mt-1 ml-9">
-                    See all 500 reviews
-                  </p>
+                  {/* Can render the reviews and rating from thr reviews api */}
+                  <div className="mb-4">
+                    <button className="w-full flex justify-start items-center">
+                      <div className="flex items-center">
+                        <Star
+                          fill="#4d7c1b"
+                          strokeWidth={0}
+                          className="h-6 w-6 mr-2"
+                        />
+                        <span className="text-[#4d7c1b]">4.7 Excellent</span>
+                      </div>
+                      <ChevronRight className="w-5 h-5 text-teal-500 ml-24" />
+                    </button>
+                    <p className="text-sm text-gray-500 mt-1 ml-9">
+                      See all 500 reviews
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -217,37 +216,9 @@ export const RestaurantPage: React.FC = () => {
             )} */}
           </nav>
         </div>
-        <div>
-          <div className="my-5">
-            <DishCard
-              name="Chicken Caesar Salad"
-              description="Romaine lettuce, grilled chicken, croutons, parmesan cheese, Caesar dressing"
-              price={7.99}
-              imageUrl="https://loremflickr.com/320/320/food,restaurant?lock=1568372147159672"
-              isAvailable={true}
-              ingredients="Contains sulphur dioxide/sulphites, gluten, soybeans"
-              onAddToBasket={() => console.log("Add to basket")}
-              calories={450}
-            />
-          </div>
 
-          <div className="my-5">
-            <DishCard
-              name="Chicken Caesar Salad"
-              description="Romaine lettuce, grilled chicken, croutons, parmesan cheese, Caesar dressing"
-              price={7.99}
-              imageUrl="https://loremflickr.com/320/320/food,restaurant?lock=1568372147159672"
-              isAvailable={false}
-              ingredients="Contains known allergens"
-              onAddToBasket={() => console.log("Add to basket")}
-              calories={450}
-            />
-          </div>
-
-          <Basket />
-
-          {/* Mock content for demonstration */}
-          <div>
+        <div className="flex relative">
+          <div className="grow">
             {dishCategories?.map((category) => (
               <div
                 key={`section${category.dish_category_id}`}
@@ -285,6 +256,10 @@ export const RestaurantPage: React.FC = () => {
                 </div>
               </div>
             ))}
+          </div>
+
+          <div className="grow mt-8">
+            <Basket />
           </div>
         </div>
       </>
