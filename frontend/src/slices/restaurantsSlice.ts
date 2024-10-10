@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-interface Restaurant {
+export interface Restaurant {
   restaurant_id: number;
   name: string;
   thumbnail_image_url: string;
@@ -13,7 +13,7 @@ interface Restaurant {
   notes: string;
 }
 
-interface RestaurantResponse {
+interface RestaurantsResponse {
   status: string;
   restaurants: Restaurant[];
 }
@@ -33,7 +33,7 @@ const initialState: RestaurantsState = {
 export const fetchRestaurants = createAsyncThunk(
   "restaurants/fetchRestaurants",
   async () => {
-    const response = await axios.get<RestaurantResponse>(
+    const response = await axios.get<RestaurantsResponse>(
       "http://localhost:8080/api/public/restaurants?page=1&limit=10"
     );
     console.log("response.data" + response.data.restaurants);
@@ -41,7 +41,7 @@ export const fetchRestaurants = createAsyncThunk(
   }
 );
 
-export const restaurantSlice = createSlice({
+export const restaurantsSlice = createSlice({
   name: "restaurants",
   initialState,
   reducers: {},
@@ -62,4 +62,5 @@ export const restaurantSlice = createSlice({
   },
 });
 
-export default restaurantSlice.reducer;
+const restaurantsSliceReducer = restaurantsSlice.reducer;
+export { restaurantsSliceReducer };

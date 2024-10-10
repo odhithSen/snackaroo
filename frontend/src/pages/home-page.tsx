@@ -26,7 +26,7 @@ export const HomePage: React.FC = () => {
         <div className="flex justify-center mx-5">
           <div className="flex flex-wrap justify-center gap-5">
             {restaurants.map((restaurant) => (
-              <a href={`/restaurants/${restaurant.restaurant_id}`}>
+              <a href={`/restaurant/${restaurant.restaurant_id}`}>
                 <RestaurantCard
                   key={restaurant.restaurant_id}
                   name={restaurant.name}

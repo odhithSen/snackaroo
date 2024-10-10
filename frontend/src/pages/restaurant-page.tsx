@@ -11,7 +11,10 @@ import {
 } from "src/components/ui/dropdown-menu";
 import DishCard from "src/components/cards/dish-card";
 import Basket from "src/components/basket";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "src/store";
+import { fetchRestaurant } from "src/slices/restaurantSlice";
 
 //Mock data
 type Category = {
@@ -32,6 +35,9 @@ const categories: Category[] = [
 ];
 
 export const RestaurantPage: React.FC = () => {
+  const navigate = useNavigate();
+  const { restaurantId } = useParams();
+
   // stuff for category bar
   const [visibleCategories, setVisibleCategories] =
     useState<Category[]>(categories);
@@ -39,9 +45,6 @@ export const RestaurantPage: React.FC = () => {
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const navRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const { restaurantId } = useParams();
-
-  console.log("restaurantId", restaurantId);
 
   useEffect(() => {
     const updateCategories = () => {
@@ -71,45 +74,46 @@ export const RestaurantPage: React.FC = () => {
     };
 
     updateCategories();
+    console.log("resize use effect ran");
     window.addEventListener("resize", updateCategories);
     return () => window.removeEventListener("resize", updateCategories);
-  }, []);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollPosition = window.scrollY + 100; // 100px offset for nav height
-
-      categories.forEach((category) => {
-        const element = document.getElementById(`section-${category.id}`);
-        if (element) {
-          const { top, bottom } = element.getBoundingClientRect();
-          if (top <= scrollPosition && bottom > scrollPosition) {
-            setActiveCategory(category.id);
-          }
-        }
-      });
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const handleCategoryClick = (categoryId: string) => {
     const element = document.getElementById(`section-${categoryId}`);
     if (element) {
+      setActiveCategory(categoryId);
       element.scrollIntoView({ behavior: "smooth" });
     }
   };
 
+  const dispatch = useDispatch<AppDispatch>();
+  const { restaurant, loading, error } = useSelector(
+    (state: RootState) => state.restaurant
+  );
+
+  useEffect(() => {
+    dispatch(fetchRestaurant({ restaurantID: Number(restaurantId) }));
+  }, [dispatch, restaurantId]);
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error}</p>;
+
   return (
     <PageLayout>
       <>
+        {/* remove this before moving to production */}
         <h1 className="m-3 text-xl font-bold">This is the restaurant page</h1>
+
+        <h1>{restaurant ? restaurant.name : "name"}</h1>
 
         {/* Restaurant page hero section */}
         <div className="w-full bg-white">
           <div className="max-w-[1775px] mx-auto p-6">
-            <button className="text-teal-500 flex items-center mb-4">
+            <button
+              className="text-teal-500 flex items-center mb-4"
+              onClick={() => navigate(-1)}
+            >
               <ArrowLeft className="w-5 h-5 mr-2" />
               Back
             </button>
@@ -222,7 +226,8 @@ export const RestaurantPage: React.FC = () => {
               </DropdownMenu>
             )}
           </nav>
-
+        </div>
+        <div>
           <div className="my-5">
             <DishCard
               name="Chicken Caesar Salad"
