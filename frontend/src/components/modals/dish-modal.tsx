@@ -1,7 +1,9 @@
 import { useState } from "react";
-import { Dialog, DialogContent } from "../ui/dialog";
+import { Dialog, DialogContent, DialogHeader } from "../ui/dialog";
 import { Button } from "../ui/button";
 import { PlusIcon, MinusIcon, XIcon } from "lucide-react";
+import { DialogTitle } from "@radix-ui/react-dialog";
+import { RestaurantDishItem } from "src/models/restaurant-dish-item";
 
 interface DishModalProps {
   isOpen: boolean;
@@ -12,6 +14,8 @@ interface DishModalProps {
   imageUrl: string;
   isAvailable: boolean;
   ingredients: string;
+  dishItem: RestaurantDishItem;
+  onAddToBasket: (dishItem: RestaurantDishItem, quantity: number) => void;
 }
 
 export default function DishModal({
@@ -23,15 +27,32 @@ export default function DishModal({
   imageUrl,
   isAvailable,
   ingredients,
+  dishItem,
+  onAddToBasket,
 }: DishModalProps) {
   const [quantity, setQuantity] = useState(1);
 
   const handleIncrement = () => setQuantity((prev) => prev + 1);
   const handleDecrement = () => setQuantity((prev) => Math.max(1, prev - 1));
 
+  const handleAddToBasket = () => {
+    onAddToBasket(dishItem, quantity);
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[500px] p-0 overflow-hidden">
+    <Dialog
+      open={isOpen}
+      onOpenChange={onClose}
+      aria-labelledby="dialog-title"
+      aria-describedby="dialog-description"
+    >
+      <DialogTitle className="sr-only" id="dialog-title">
+        Dialog for dish {name}
+      </DialogTitle>
+      <DialogContent
+        className="sm:max-w-[500px] p-0 overflow-hidden"
+        id="dialog-description"
+      >
         <div className="relative">
           <img src={imageUrl} alt={name} className="w-full h-72 object-cover" />
           <Button
@@ -92,6 +113,7 @@ export default function DishModal({
               !isAvailable && "bg-gray-300 text-gray-600"
             }`}
             disabled={!isAvailable}
+            onClick={handleAddToBasket}
           >
             Add for £{(price * quantity).toFixed(2)}
           </Button>

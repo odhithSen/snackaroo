@@ -10,12 +10,14 @@ import { AppDispatch, RootState } from "src/store";
 import { fetchRestaurant } from "src/slices/restaurantSlice";
 import { fetchDishCategories } from "src/slices/dishCategoriesSlice";
 import axios from "axios";
-import { RestaurantDishItem } from "src/models/restaurat-dish-item";
+import { RestaurantDishItem } from "src/models/restaurant-dish-item";
+import { BasketItem } from "src/models/basket-item";
 
 export const RestaurantPage: React.FC = () => {
   const navigate = useNavigate();
   const { restaurantId } = useParams();
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [basketItems, setBasketItems] = useState<BasketItem[]>([]);
 
   const dispatch = useDispatch<AppDispatch>();
 
@@ -38,6 +40,27 @@ export const RestaurantPage: React.FC = () => {
   const dishCategoriesError = useSelector(
     (state: RootState) => state.dishCategories.error
   );
+
+  const addToBasket = (dishItem: RestaurantDishItem, quantity: number) => {
+    setBasketItems((prevItems) => {
+      const existingItem = prevItems.find(
+        (item) => item.dishItem.dish_id === dishItem.dish_id
+      );
+      if (existingItem) {
+        return prevItems.map((item) =>
+          item.dishItem.dish_id === dishItem.dish_id
+            ? { ...item, quantity: item.quantity + quantity }
+            : item
+        );
+      } else {
+        return [...prevItems, { dishItem, quantity }];
+      }
+    });
+  };
+
+  const clearBasket = () => {
+    setBasketItems([]);
+  };
 
   const handleCategoryClick = (categoryId: string) => {
     const element = document.getElementById(`section${categoryId}`);
@@ -245,12 +268,9 @@ export const RestaurantPage: React.FC = () => {
                         imageUrl={dish.thumbnail_image_url}
                         isAvailable={dish.isAvailable ?? true}
                         ingredients={dish.ingredients}
-                        onAddToBasket={() =>
-                          console.log(
-                            "Add to basket clicked on " + dish.dish_name
-                          )
-                        }
+                        onAddToBasket={addToBasket}
                         calories={dish.calories}
+                        dishItem={dish}
                       />
                     ))}
                 </div>
@@ -259,7 +279,7 @@ export const RestaurantPage: React.FC = () => {
           </div>
 
           <div className="grow mt-8">
-            <Basket />
+            <Basket basketItems={basketItems} clearBasket={clearBasket} />
           </div>
         </div>
       </>

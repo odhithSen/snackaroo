@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Button } from "src/components/ui/button";
 import { PlusIcon } from "lucide-react";
-// import DishModal from "../modals/dish-modal-old";
 import DishModal from "../modals/dish-modal";
+import { RestaurantDishItem } from "src/models/restaurant-dish-item";
 
 interface DishCardProps {
   name: string;
@@ -13,7 +13,8 @@ interface DishCardProps {
   isAvailable: boolean;
   calories: number;
   ingredients: string;
-  onAddToBasket: () => void;
+  dishItem: RestaurantDishItem;
+  onAddToBasket: (dishItem: RestaurantDishItem, quantity: number) => void;
 }
 
 export default function DishCard({
@@ -25,6 +26,7 @@ export default function DishCard({
   isAvailable,
   calories,
   ingredients,
+  dishItem,
   onAddToBasket,
 }: DishCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -98,6 +100,8 @@ export default function DishCard({
         imageUrl={imageUrl}
         isAvailable={isAvailable}
         ingredients={ingredients}
+        dishItem={dishItem}
+        onAddToBasket={onAddToBasket}
       />
     </>
   );

@@ -7,52 +7,35 @@ import {
   CardTitle,
 } from "./ui/card";
 import { Button } from "./ui/button";
-import {
-  Trash2,
-  ChevronRight,
-  Plus,
-  Minus,
-  HelpCircle,
-  ShoppingBasket,
-} from "lucide-react";
+import { Trash2, ChevronRight, HelpCircle, ShoppingBasket } from "lucide-react";
 import { ScrollArea } from "./ui/scroll-area";
-
-interface BasketItem {
-  name: string;
-  quantity: number;
-  price: number;
-}
+import { BasketItem } from "src/models/basket-item";
 
 interface Fee {
   name: string;
   amount: number;
 }
 
-export default function Basket() {
-  const [basketItems, setBasketItems] = React.useState<BasketItem[]>([
-    { name: "Chicken wrap", quantity: 1, price: 5.99 },
-    { name: "Salad", quantity: 1, price: 3.99 },
-  ]);
+interface BasketProps {
+  basketItems: BasketItem[];
+  clearBasket: () => void;
+}
+
+export default function Basket({ basketItems, clearBasket }: BasketProps) {
   const [riderTip, setRiderTip] = React.useState(0);
 
   const fees: Fee[] = [
-    { name: "Service fee", amount: 1.08 },
-    { name: "Delivery fee", amount: 0.99 },
-    { name: "Bag fee", amount: 0.1 },
+    { name: "Service fee", amount: 0.0 },
+    { name: "Delivery fee", amount: 0.0 },
+    { name: "Bag fee", amount: 0.0 },
   ];
 
   const basketSubtotal = basketItems.reduce(
-    (total, item) => total + item.price * item.quantity,
+    (total, item) => total + item.dishItem.base_price * item.quantity,
     0
   );
   const feesTotal = fees.reduce((total, fee) => total + fee.amount, 0);
   const orderTotal = basketSubtotal + feesTotal + riderTip;
-
-  const clearBasket = () => {
-    setBasketItems([]);
-    setRiderTip(0);
-  };
-
   const isBasketEmpty = basketItems.length === 0;
 
   return (
@@ -87,10 +70,12 @@ export default function Basket() {
                     >
                       <span>
                         {item.quantity}x
-                        <span className="ml-3">{item.name}</span>
+                        <span className="ml-3">{item.dishItem.dish_name}</span>
                       </span>
                       <div className="flex items-center">
-                        <span className="mr-2">£{item.price.toFixed(2)}</span>
+                        <span className="mr-2">
+                          £{item.dishItem.base_price}
+                        </span>
                         <ChevronRight className="h-5 w-5 text-teal-500" />
                       </div>
                     </div>
