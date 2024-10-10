@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader } from "../ui/dialog";
+import { Dialog, DialogContent } from "../ui/dialog";
 import { Button } from "../ui/button";
 import { PlusIcon, MinusIcon, XIcon } from "lucide-react";
 import { DialogTitle } from "@radix-ui/react-dialog";

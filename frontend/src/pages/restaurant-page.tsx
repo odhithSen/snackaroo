@@ -12,12 +12,14 @@ import { fetchDishCategories } from "src/slices/dishCategoriesSlice";
 import axios from "axios";
 import { RestaurantDishItem } from "src/models/restaurant-dish-item";
 import { BasketItem } from "src/models/basket-item";
+import RestaurantInfoModal from "src/components/modals/restaurant-info-modal";
 
 export const RestaurantPage: React.FC = () => {
   const navigate = useNavigate();
   const { restaurantId } = useParams();
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [basketItems, setBasketItems] = useState<BasketItem[]>([]);
+  const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
 
   const dispatch = useDispatch<AppDispatch>();
 
@@ -142,7 +144,13 @@ export const RestaurantPage: React.FC = () => {
                     0.20 miles away · Opens at 11:00 · £7.00 minimum · £0.49
                     delivery
                   </p>
-                  <div className="py-3 mb-4">
+                  <div
+                    className="py-3 mb-4"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIsInfoModalOpen(true);
+                    }}
+                  >
                     <button className="w-full flex justify-start items-center text-left">
                       <div className="flex items-center">
                         <div className="w-6 h-6 flex items-center justify-center mr-3">
@@ -282,6 +290,13 @@ export const RestaurantPage: React.FC = () => {
             <Basket basketItems={basketItems} clearBasket={clearBasket} />
           </div>
         </div>
+        {restaurant && (
+          <RestaurantInfoModal
+            isOpen={isInfoModalOpen}
+            onClose={() => setIsInfoModalOpen(false)}
+            info={restaurant}
+          />
+        )}
       </>
     </PageLayout>
   );
