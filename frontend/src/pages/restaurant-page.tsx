@@ -1,39 +1,19 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { PageLayout } from "../components/page-layout";
-import { ArrowLeft, ChevronRight, ChevronDown, Info, Star } from "lucide-react";
+import { ArrowLeft, ChevronRight, Info, Star } from "lucide-react";
 import { Button } from "src/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "src/components/ui/dropdown-menu";
 import DishCard from "src/components/cards/dish-card";
 import Basket from "src/components/basket";
 import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "src/store";
 import { fetchRestaurant } from "src/slices/restaurantSlice";
-import {
-  fetchDishCategories,
-  RestaurantDishCategory,
-} from "src/slices/dishCategoriesSlice";
+import { fetchDishCategories } from "src/slices/dishCategoriesSlice";
 
 export const RestaurantPage: React.FC = () => {
   const navigate = useNavigate();
   const { restaurantId } = useParams();
-
-  // stuff for category bar
-  const [visibleCategories, setVisibleCategories] = useState<
-    RestaurantDishCategory[]
-  >([]);
-  const [hiddenCategories, setHiddenCategories] = useState<
-    RestaurantDishCategory[]
-  >([]);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
-  const navRef = useRef<HTMLDivElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
 
   const dispatch = useDispatch<AppDispatch>();
 
@@ -57,47 +37,8 @@ export const RestaurantPage: React.FC = () => {
     (state: RootState) => state.dishCategories.error
   );
 
-  useEffect(() => {
-    if (!dishCategories) {
-      return;
-    }
-    console.log("use effect ran:", dishCategories);
-    const updateCategories = () => {
-      if (containerRef.current) {
-        const containerWidth = containerRef.current.offsetWidth;
-        let visibleWidth = 0;
-        const visible: RestaurantDishCategory[] = [];
-        const hidden: RestaurantDishCategory[] = [];
-
-        dishCategories.forEach((category) => {
-          const categoryElement = document.getElementById(
-            category.dish_category_id.toString()
-          );
-          if (categoryElement) {
-            const categoryWidth = categoryElement.offsetWidth;
-            if (visibleWidth + categoryWidth + 300 < containerWidth) {
-              // 100px buffer for "More" button
-              visible.push(category);
-              visibleWidth += categoryWidth;
-            } else {
-              hidden.push(category);
-            }
-          }
-        });
-
-        setVisibleCategories(visible);
-        setHiddenCategories(hidden);
-      }
-    };
-
-    updateCategories();
-    console.log("resize use effect ran");
-    window.addEventListener("resize", updateCategories);
-    return () => window.removeEventListener("resize", updateCategories);
-  }, [dishCategories]);
-
   const handleCategoryClick = (categoryId: string) => {
-    const element = document.getElementById(`section-${categoryId}`);
+    const element = document.getElementById(`section${categoryId}`);
     if (element) {
       setActiveCategory(categoryId);
       element.scrollIntoView({ behavior: "smooth" });
@@ -200,37 +141,33 @@ export const RestaurantPage: React.FC = () => {
         </div>
 
         {/* Restaurant category section */}
-        <div
-          ref={containerRef}
-          className="sticky top-0 bg-white z-10 shadow-sm"
-        >
-          <nav
-            ref={navRef}
-            className="flex items-center justify-start border-y border-[#eaeaea] shadow-sm overflow-x-auto px-4 py-5"
-          >
-            {visibleCategories?.map((category) => (
-              <Button
-                key={category.dish_category_id}
-                id={category.dish_category_id.toString()}
-                variant={
-                  activeCategory === category.dish_category_id.toString()
-                    ? "default"
-                    : "ghost"
-                }
-                className={`mx-2 px-4 py-1 h-auto text-sm font-normal rounded-2xl ${
-                  activeCategory === category.dish_category_id.toString()
-                    ? "bg-teal-500 text-white hover:bg-teal-600"
-                    : "text-teal-500 hover:bg-gray-100 hover:text-teal-500"
-                }`}
-                onClick={() =>
-                  handleCategoryClick(category.dish_category_id.toString())
-                }
-              >
-                {category.dish_category_name}
-              </Button>
+        <div className="sticky top-[69px] bg-white z-10 shadow-sm">
+          <nav className="flex items-center justify-start border-y border-[#eaeaea] shadow-sm overflow-x-auto px-4 py-5">
+            {dishCategories?.map((category) => (
+              <div id={"category:" + category.dish_category_id.toString()}>
+                <Button
+                  key={category.dish_category_id}
+                  id={category.dish_category_name}
+                  variant={
+                    activeCategory === category.dish_category_id.toString()
+                      ? "default"
+                      : "ghost"
+                  }
+                  className={`mx-2 px-4 py-1 h-auto text-sm font-normal rounded-2xl ${
+                    activeCategory === category.dish_category_id.toString()
+                      ? "bg-teal-500 text-white hover:bg-teal-600"
+                      : "text-teal-500 hover:bg-gray-100 hover:text-teal-500"
+                  }`}
+                  onClick={() =>
+                    handleCategoryClick(category.dish_category_id.toString())
+                  }
+                >
+                  {category.dish_category_name}
+                </Button>
+              </div>
             ))}
 
-            {hiddenCategories.length > 0 && (
+            {/* {hiddenCategories.length > 0 && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
@@ -246,9 +183,7 @@ export const RestaurantPage: React.FC = () => {
                       <DropdownMenuItem
                         key={category.dish_category_id}
                         onClick={() =>
-                          handleCategoryClick(
-                            category.dish_category_id.toString()
-                          )
+                          handleCategoryClick(category.dish_category_name)
                         }
                         className="px-4 py-3 font-normal"
                       >
@@ -259,7 +194,7 @@ export const RestaurantPage: React.FC = () => {
                   ))}
                 </DropdownMenuContent>
               </DropdownMenu>
-            )}
+            )} */}
           </nav>
         </div>
         <div>
@@ -292,16 +227,22 @@ export const RestaurantPage: React.FC = () => {
           <Basket />
 
           {/* Mock content for demonstration */}
-          {/* {categories.map((category) => (
+          {dishCategories.map((category) => (
             <div
-              key={category.id}
-              id={`section-${category.id}`}
+              key={category.dish_category_id}
+              id={`section${category.dish_category_id}`}
               className="min-h-screen p-4"
             >
-              <h2 className="text-2xl font-bold mb-4">{category.name}</h2>
-              <p>This is the content for the {category.name} section.</p>
+              <div className="h-[140px]"></div>
+              <h2 className="text-2xl font-bold mb-4">
+                {category.dish_category_name}
+              </h2>
+              <p>
+                This is the content for the {category.dish_category_name}{" "}
+                section.
+              </p>
             </div>
-          ))} */}
+          ))}
         </div>
       </>
     </PageLayout>
