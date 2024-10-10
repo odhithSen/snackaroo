@@ -144,9 +144,11 @@ export const RestaurantPage: React.FC = () => {
         <div className="sticky top-[69px] bg-white z-10 shadow-sm">
           <nav className="flex items-center justify-start border-y border-[#eaeaea] shadow-sm overflow-x-auto px-4 py-5">
             {dishCategories?.map((category) => (
-              <div id={"category:" + category.dish_category_id.toString()}>
+              <div
+                id={"category:" + category.dish_category_id.toString()}
+                key={"category:" + category.dish_category_id}
+              >
                 <Button
-                  key={category.dish_category_id}
                   id={category.dish_category_name}
                   variant={
                     activeCategory === category.dish_category_id.toString()
