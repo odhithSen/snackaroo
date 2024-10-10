@@ -9,6 +9,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "src/store";
 import { fetchRestaurant } from "src/slices/restaurantSlice";
 import { fetchDishCategories } from "src/slices/dishCategoriesSlice";
+import axios from "axios";
+import { RestaurantDishItem } from "src/models/restaurat-dish-item";
 
 export const RestaurantPage: React.FC = () => {
   const navigate = useNavigate();
@@ -52,6 +54,22 @@ export const RestaurantPage: React.FC = () => {
   useEffect(() => {
     dispatch(fetchDishCategories({ restaurantID: Number(restaurantId) }));
   }, [dispatch, restaurantId]);
+
+  const [dishItems, setDishItems] = useState<RestaurantDishItem[]>([]);
+  useEffect(() => {
+    const fetchDishes = async () => {
+      try {
+        const resp = await axios.get(
+          `${process.env.REACT_APP_BACKEND_URL}/public/restaurants/${restaurantId}/dishes`
+        );
+        setDishItems(resp.data.dishes);
+      } catch (error) {
+        // TODO: display error message to user
+        console.error("Error fetching dishes", error);
+      }
+    };
+    fetchDishes();
+  }, [restaurantId]);
 
   if (restaurantLoading || dishCategoriesLoading) {
     return <div>Loading...</div>;
@@ -229,22 +247,45 @@ export const RestaurantPage: React.FC = () => {
           <Basket />
 
           {/* Mock content for demonstration */}
-          {dishCategories.map((category) => (
-            <div
-              key={category.dish_category_id}
-              id={`section${category.dish_category_id}`}
-              className="min-h-screen p-4"
-            >
-              <div className="h-[140px]"></div>
-              <h2 className="text-2xl font-bold mb-4">
-                {category.dish_category_name}
-              </h2>
-              <p>
-                This is the content for the {category.dish_category_name}{" "}
-                section.
-              </p>
-            </div>
-          ))}
+          <div>
+            {dishCategories?.map((category) => (
+              <div
+                key={`section${category.dish_category_id}`}
+                id={`section${category.dish_category_id}`}
+                className="p-4"
+              >
+                <div className="h-[140px]"></div>
+                <h2 className="text-2xl font-bold mb-4">
+                  {category.dish_category_name}
+                </h2>
+
+                <div>
+                  {dishItems
+                    .filter(
+                      (dish) =>
+                        dish.dish_category_id === category.dish_category_id
+                    )
+                    .map((dish) => (
+                      <DishCard
+                        key={dish.dish_id + Math.random()}
+                        name={dish.dish_name}
+                        description={dish.dish_description}
+                        price={dish?.base_price ?? 0}
+                        imageUrl={dish.thumbnail_image_url}
+                        isAvailable={dish.isAvailable ?? true}
+                        ingredients={dish.ingredients}
+                        onAddToBasket={() =>
+                          console.log(
+                            "Add to basket clicked on " + dish.dish_name
+                          )
+                        }
+                        calories={dish.calories}
+                      />
+                    ))}
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </>
     </PageLayout>

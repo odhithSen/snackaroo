@@ -57,7 +57,7 @@ export default function DishCard({
           </div>
           <div className="mt-2 flex items-center">
             <span className="text-base font-normal text-gray-900">
-              £{price.toFixed(2)}
+              £{price}
             </span>
             {isPopular && isAvailable && (
               <span className="ml-2 text-sm font-medium text-orange-500">
