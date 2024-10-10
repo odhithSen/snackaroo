@@ -68,8 +68,8 @@ export default function Basket() {
         )}
       </CardHeader>
 
-      <ScrollArea className="flex-grow">
-        <CardContent className="space-y-4">
+      <ScrollArea className="flex-grow" type="always">
+        <CardContent className="space-y-4 h-full">
           {isBasketEmpty ? (
             <div className="h-full flex flex-col items-center justify-center text-gray-400">
               <ShoppingBasket className="h-16 w-16 mb-4" />
@@ -96,7 +96,7 @@ export default function Basket() {
                     </div>
                   ))}
 
-                  <div className="flex justify-between items-center px-4 py-3">
+                  <div className="flex justify-between items-center px-2 py-3">
                     <span className="font-normal">Basket subtotal</span>
                     <span className="mr-6">£{basketSubtotal.toFixed(2)}</span>
                   </div>
@@ -126,10 +126,13 @@ export default function Basket() {
                 </div>
               </div> */}
 
-              <div className="p-3 border border-gray-200 rounded-sm">
+              <div className="px-3 py-2 border border-gray-200 rounded-sm">
                 <div className="flex justify-between items-center">
                   <span>Notes for restaurant</span>
-                  <Button variant="link" className="text-teal-500 p-0">
+                  <Button
+                    variant="link"
+                    className="text-teal-500 p-0 text-base font-normal"
+                  >
                     Add
                   </Button>
                 </div>
@@ -137,26 +140,29 @@ export default function Basket() {
               </div>
 
               <div>
-                <h3 className="font-semibold flex items-center">
-                  Fees
-                  <HelpCircle className="h-4 w-4 ml-1 text-gray-400" />
-                </h3>
-                {fees.map((fee, index) => (
-                  <div
-                    key={index}
-                    className="flex justify-between items-center mt-1"
-                  >
-                    <span>{fee.name}</span>
-                    <span>£{fee.amount.toFixed(2)}</span>
-                  </div>
-                ))}
+                <div className=" w-full flex flex-row items-center justify-between my-2">
+                  <h3 className="text-lg font-bold">Fees</h3>
+                  <HelpCircle className="h-5 w-5 ml-1 text-teal-500" />
+                </div>
+
+                <div className="border border-gray-200 rounded-sm">
+                  {fees.map((fee, index) => (
+                    <div
+                      key={index}
+                      className="flex justify-between items-center font-normal px-4 py-2"
+                    >
+                      <span>{fee.name}</span>
+                      <span>£{fee.amount.toFixed(2)}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
 
               <div className="bg-red-100 text-red-600 p-2 rounded-md text-sm">
                 Add £5.15 to get 20% off
               </div>
 
-              <div>
+              {/* <div>
                 <div className="flex justify-between items-center">
                   <span>Rider tip</span>
                   <div className="flex items-center space-x-2">
@@ -177,20 +183,20 @@ export default function Basket() {
                     </Button>
                   </div>
                 </div>
-              </div>
+              </div> */}
 
-              <div className="flex justify-between items-center font-semibold">
+              <div className="flex justify-between items-center">
                 <span>Order total</span>
-                <span>£{orderTotal.toFixed(2)}</span>
+                <span className="font-bold">£{orderTotal.toFixed(2)}</span>
               </div>
             </>
           )}
         </CardContent>
       </ScrollArea>
 
-      <CardFooter>
+      <CardFooter className={!isBasketEmpty ? `border-t border-gray-200` : ``}>
         <Button
-          className={`w-full text-md font-bold rounded-sm py-6 ${
+          className={`w-full text-md font-bold rounded-sm py-6 mt-8 ${
             isBasketEmpty
               ? "bg-gray-300 text-gray-500"
               : "bg-teal-500 hover:bg-teal-600 text-white"
