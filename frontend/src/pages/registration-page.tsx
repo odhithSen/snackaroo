@@ -8,7 +8,6 @@ import {
   CardHeader,
   CardTitle,
 } from "../components/ui/card";
-// import { Upload } from "lucide-react";
 import { PageFooter } from "src/components/page-footer";
 
 interface FormData {
@@ -89,15 +88,14 @@ export const RegistrationPage: React.FC = () => {
     <div>
       <div className="min-h-screen bg-teal-600 flex items-center justify-center p-4">
         <Card className="w-full max-w-md bg-white rounded-lg shadow-lg">
-          <CardHeader className="pb-0">
+          <CardHeader className="pb-5">
             <CardTitle className="text-2xl font-bold text-center text-gray-800">
-              Sign up or log in
+              Sign up
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-center text-gray-600 mb-6">
-              Please enter your details. We will then send you a 6-digit code to
-              verify your information.
+              Please enter your details. We will then verify your information.
             </p>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
@@ -136,7 +134,7 @@ export const RegistrationPage: React.FC = () => {
                 )}
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-2 pb-5">
                 <Label htmlFor="contact_number" className="text-gray-700">
                   Phone Number
                 </Label>
