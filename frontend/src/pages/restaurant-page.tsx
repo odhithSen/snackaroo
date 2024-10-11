@@ -13,6 +13,7 @@ import axios from "axios";
 import { RestaurantDishItem } from "src/models/restaurant-dish-item";
 import { BasketItem } from "src/models/basket-item";
 import RestaurantInfoModal from "src/components/modals/restaurant-info-modal";
+import ReviewModal from "src/components/modals/review-modal";
 
 export const RestaurantPage: React.FC = () => {
   const navigate = useNavigate();
@@ -20,6 +21,7 @@ export const RestaurantPage: React.FC = () => {
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [basketItems, setBasketItems] = useState<BasketItem[]>([]);
   const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
 
   const dispatch = useDispatch<AppDispatch>();
 
@@ -166,7 +168,13 @@ export const RestaurantPage: React.FC = () => {
                   </div>
 
                   {/* Can render the reviews and rating from thr reviews api */}
-                  <div className="mb-4">
+                  <div
+                    className="mb-4"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIsReviewModalOpen(true);
+                    }}
+                  >
                     <button className="w-full flex justify-start items-center">
                       <div className="flex items-center">
                         <Star
@@ -295,6 +303,13 @@ export const RestaurantPage: React.FC = () => {
             isOpen={isInfoModalOpen}
             onClose={() => setIsInfoModalOpen(false)}
             info={restaurant}
+          />
+        )}
+        {restaurant && (
+          <ReviewModal
+            isOpen={isReviewModalOpen}
+            onClose={() => setIsReviewModalOpen(false)}
+            restaurantId={restaurant.restaurant_id}
           />
         )}
       </>
