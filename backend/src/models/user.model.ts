@@ -7,6 +7,7 @@ export interface UserRead {
   last_name?: string
   email: string
   contact_number?: string
+  profile_picture_url?: string
 }
 
 @Table({ tableName: 'user', timestamps: true, initialAutoIncrement: '10000' })
@@ -42,6 +43,11 @@ export class User
     type: DataType.STRING,
   })
   contact_number!: string
+
+  @Column({
+    type: DataType.STRING,
+  })
+  profile_picture_url!: string
 }
 
 export interface UserCreate {
@@ -50,6 +56,7 @@ export interface UserCreate {
   last_name: string
   email: string
   contact_number: string
+  profile_picture_url: string
 }
 
 export interface UserUpdate {
@@ -57,4 +64,5 @@ export interface UserUpdate {
   last_name?: string
   email?: string
   contact_number?: string
+  profile_picture_url: string
 }

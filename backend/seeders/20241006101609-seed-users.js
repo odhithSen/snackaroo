@@ -12,6 +12,7 @@ module.exports = {
         contact_number: '1234567890',
         createdAt: new Date(),
         updatedAt: new Date(),
+        profile_picture_url: 'https://avatar.iran.liara.run/public/37',
       },
     ]
 
@@ -21,6 +22,7 @@ module.exports = {
         last_name: faker.name.lastName(),
         email: faker.internet.email(),
         contact_number: faker.phone.number(),
+        profile_picture_url: faker.image.avatar(),
         createdAt: new Date(),
         updatedAt: new Date(),
       })

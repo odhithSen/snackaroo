@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express'
 import jwt from 'jsonwebtoken'
-import { getUserByEmail } from '../services/user.service'
+import { getUserByEmail } from '../services/user-info.service'
 import { User, UserRead } from '../models/user.model'
 
 interface DecodedToken {

@@ -25,6 +25,9 @@ module.exports = {
         contact_number: {
           type: Sequelize.STRING,
         },
+        profile_picture_url: {
+          type: Sequelize.STRING,
+        },
         createdAt: {
           allowNull: false,
           type: Sequelize.DATE,
