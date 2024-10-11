@@ -262,9 +262,8 @@ export const RestaurantPage: React.FC = () => {
               <div
                 key={`section${category.dish_category_id}`}
                 id={`section${category.dish_category_id}`}
-                className="p-4"
+                className="p-4 scroll-mt-[140px] mb-5"
               >
-                <div className="h-[140px]"></div>
                 <h2 className="text-2xl font-bold mb-4">
                   {category.dish_category_name}
                 </h2>
