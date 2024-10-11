@@ -9,11 +9,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "src/store";
 import { fetchRestaurant } from "src/slices/restaurantSlice";
 import { fetchDishCategories } from "src/slices/dishCategoriesSlice";
-import axios from "axios";
 import { RestaurantDishItem } from "src/models/restaurant-dish-item";
 import { BasketItem } from "src/models/basket-item";
 import RestaurantInfoModal from "src/components/modals/restaurant-info-modal";
 import ReviewModal from "src/components/modals/review-modal";
+import { useApi } from "src/hooks/useApi";
 
 export const RestaurantPage: React.FC = () => {
   const navigate = useNavigate();
@@ -82,21 +82,26 @@ export const RestaurantPage: React.FC = () => {
     dispatch(fetchDishCategories({ restaurantID: Number(restaurantId) }));
   }, [dispatch, restaurantId]);
 
-  const [dishItems, setDishItems] = useState<RestaurantDishItem[]>([]);
-  useEffect(() => {
-    const fetchDishes = async () => {
-      try {
-        const resp = await axios.get(
-          `${process.env.REACT_APP_BACKEND_URL}/public/restaurants/${restaurantId}/dishes`
-        );
-        setDishItems(resp.data.dishes);
-      } catch (error) {
-        // TODO: display error message to user
-        console.error("Error fetching dishes", error);
-      }
-    };
-    fetchDishes();
-  }, [restaurantId]);
+  const dishesState = useApi({
+    endpoint: `/public/restaurants/${restaurantId}/dishes`,
+    isPublic: true,
+    dependencies: [restaurantId],
+  });
+
+  const dishesLoading = dishesState.loading;
+  const dishesError = dishesState.error;
+  const dishItems: RestaurantDishItem[] =
+    (dishesState.data?.dishes as RestaurantDishItem[]) ?? [];
+
+  if (dishesError) {
+    console.error("Error fetching dishes", dishesError);
+  }
+
+  if (dishesLoading) {
+    console.log("Loading dishes...");
+  } else {
+    console.log("Dishes loaded");
+  }
 
   if (restaurantLoading || dishCategoriesLoading) {
     return <div>Loading...</div>;

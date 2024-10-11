@@ -10,6 +10,7 @@ import { NotFoundPage } from "./pages/not-found-page";
 import { ProfilePage } from "./pages/profile-page";
 import { ProtectedPage } from "./pages/protected-page";
 import { RestaurantPage } from "./pages/restaurant-page";
+import { RegistrationPage } from "./pages/registration-page";
 
 export const App: React.FC = () => {
   const { isLoading } = useAuth0();
@@ -24,6 +25,10 @@ export const App: React.FC = () => {
   return (
     <Routes>
       <Route path="/" element={<HomePage />} />
+      <Route
+        path="/register"
+        element={<AuthenticationGuard component={RegistrationPage} />}
+      />
       <Route path="/restaurant/:restaurantId" element={<RestaurantPage />} />
       <Route
         path="/profile"
