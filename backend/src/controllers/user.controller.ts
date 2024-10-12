@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response, Router } from 'express'
-import { addOrder, addOrderItems, addReview } from '../services/user.service'
+import { addOrder, addOrderItems, addReview, getOrderByOrderId } from '../services/user.service'
 import { RestaurantReviewCreate } from '../models/restaurant_review.model'
 import Ajv, { JSONSchemaType } from 'ajv'
 import addFormats from 'ajv-formats'
@@ -150,6 +150,27 @@ router.post('/order', async (req: Request, res: Response, next: NextFunction) =>
     const createdOrderItems = await addOrderItems(dishItems)
 
     res.status(201).json({ status: 'success', data: createdOrder })
+  } catch (error) {
+    next(error)
+  }
+})
+
+router.get('/orders/:orderId', async (req: Request, res: Response, next: NextFunction) => {
+  const userId = req.user.user_id
+  try {
+    const orderId = parseInt(req.params.orderId)
+    if (isNaN(orderId)) {
+      throw new HttpException(400, 'Invalid order id')
+    }
+    const order = await getOrderByOrderId(orderId)
+    if (order instanceof HttpException) {
+      throw order
+    }
+    if (order.user_id !== userId) {
+      throw new HttpException(403, 'You are not authorized to view this order')
+    }
+
+    res.json({ status: 'success', order })
   } catch (error) {
     next(error)
   }

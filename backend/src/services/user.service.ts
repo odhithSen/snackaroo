@@ -64,3 +64,16 @@ export async function addOrderItems(
     }
   }
 }
+
+export async function getOrderByOrderId(orderId: number): Promise<Order | HttpException> {
+  try {
+    const order = await Order.findByPk(orderId)
+    if (!order) {
+      throw new HttpException(404, 'Order not found')
+    }
+    return order
+  } catch (error) {
+    console.error('Error getting order details', error)
+    throw new HttpException(500, 'Error getting order details')
+  }
+}
