@@ -29,6 +29,8 @@ export const Auth0ProviderWithNavigate = ({
       clientId={clientId}
       authorizationParams={{
         redirect_uri: redirectUri,
+        audience: "https://user-api.example.com",
+        scope: "openid profile email",
       }}
       onRedirectCallback={onRedirectCallback}
     >

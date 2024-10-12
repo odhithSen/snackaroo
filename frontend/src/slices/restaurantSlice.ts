@@ -25,7 +25,6 @@ export const fetchRestaurant = createAsyncThunk(
     const response = await axios.get<RestaurantResponse>(
       `http://localhost:8080/api/public/restaurants/${restaurantID}`
     );
-    console.log("response.data" + response.data.restaurant);
     return response.data.restaurant;
   }
 );

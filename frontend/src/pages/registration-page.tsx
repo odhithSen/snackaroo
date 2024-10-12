@@ -9,6 +9,10 @@ import {
   CardTitle,
 } from "../components/ui/card";
 import { PageFooter } from "src/components/page-footer";
+import { useAccessToken } from "src/hooks/useAccessToken";
+import { apiCall } from "src/utils/api-call";
+import { useApi } from "src/hooks/useApi";
+import { useNavigate } from "react-router-dom";
 
 interface FormData {
   first_name: string;
@@ -25,6 +29,9 @@ interface FormErrors {
 }
 
 export const RegistrationPage: React.FC = () => {
+  const { accessToken } = useAccessToken();
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState<FormData>({
     first_name: "",
     last_name: "",
@@ -33,6 +40,16 @@ export const RegistrationPage: React.FC = () => {
   });
 
   const [errors, setErrors] = useState<FormErrors>({});
+
+  const userInfo = useApi({
+    endpoint: "user-info/me",
+  });
+  // TODO: handle already registered state
+  if (userInfo.data) {
+    console.log("User already registered:", userInfo.data);
+    navigate("/");
+  }
+  userInfo.error && console.error("Error getting user info", userInfo.error);
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -67,20 +84,29 @@ export const RegistrationPage: React.FC = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     console.log("Form submitted:", formData);
     e.preventDefault();
     if (validateForm()) {
       const registerData = formData;
       registerData.profile_picture_url = `https://avatar.iran.liara.run/username?username=${registerData.first_name}+${registerData.last_name}`;
       console.log("Form submitted:", registerData);
-
-      setFormData({
-        first_name: "",
-        last_name: "",
-        contact_number: "",
-        profile_picture_url: "",
-      });
+      try {
+        const res = await apiCall({
+          endpoint: "user-info/create",
+          method: "POST",
+          bodyData: registerData,
+          accessToken,
+        });
+        setFormData({
+          first_name: "",
+          last_name: "",
+          contact_number: "",
+          profile_picture_url: "",
+        });
+      } catch (error) {
+        console.error("Error registering user:", error);
+      }
     }
   };
 

@@ -43,11 +43,19 @@ const useApi = ({
       let accessToken = "";
       try {
         accessToken = shouldGetAccessToken
-          ? await getAccessTokenSilently()
+          ? await getAccessTokenSilently({
+              authorizationParams: {
+                audience: "https://user-api.example.com",
+                scope: "openid profile email",
+              },
+            })
           : "";
-      } catch {
-        console.error("Error getting access token. Redirecting to login...");
-        redirectToLogin();
+      } catch (error) {
+        console.error(
+          "Error getting access token. Redirecting to login...",
+          error
+        );
+        // redirectToLogin();
         return;
       }
 
@@ -67,8 +75,6 @@ const useApi = ({
         const response: AxiosResponse = await axios(config);
         setData(response.data);
       } catch (error) {
-        // TODO: Error checking logic
-        // TODO: if user authenticated but not in the db error, redirect to register page logic
         setError(error as AxiosError);
       } finally {
         setLoading(false);
