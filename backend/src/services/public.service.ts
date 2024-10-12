@@ -1,3 +1,4 @@
+import { sequelize } from '../models'
 import HttpException from '../models/http-exception.model'
 import { RestaurantDishItem, RestaurantDishItemRead } from '../models/restaurant-dish-item.model'
 import { Restaurant, RestaurantRead } from '../models/restaurant.model'
@@ -5,6 +6,8 @@ import {
   RestaurantDishCategory,
   RestaurantDishCategoryRead,
 } from '../models/restaurant_dish_category.model'
+import { RestaurantReview, RestaurantReviewRead } from '../models/restaurant_review.model'
+import { User } from '../models/user.model'
 import { PaginationValues } from '../utils/pagination-query-validation'
 
 export async function getRestaurantById(id: number): Promise<RestaurantRead | HttpException> {
@@ -219,5 +222,68 @@ export async function getDishCategoriesByRestaurantId(
     }
     console.error('Error getting dish categories', error)
     throw new HttpException(500, 'Error getting dish categories')
+  }
+}
+
+export interface UserReview {
+  id: string
+  rating: number
+  description: string
+  created_at: string
+  user: {
+    user_id: number
+    first_name: string
+    last_name: string
+    profile_picture_url?: string
+  }
+}
+
+export async function getReviewsByRestaurantId(
+  restaurantId: number,
+  paginationValues: PaginationValues,
+): Promise<UserReview[] | HttpException> {
+  try {
+    const restaurant = await Restaurant.findByPk(restaurantId)
+    if (restaurant === null) {
+      console.log('Restaurant not found')
+      throw new HttpException(404, 'Restaurant not found')
+    }
+
+    const [results, metadata] = await sequelize.query(
+      `SELECT CONCAT(RW.restaurant_id, RW.reviewer_id) as id, RW.rating, RW.description, RW.createdAt, 
+      U.user_id, U.first_name, U.last_name, U.profile_picture_url 
+      FROM restaurant_review RW JOIN user U ON RW.reviewer_id = U.user_id
+      WHERE RW.restaurant_id = ${restaurantId} 
+      LIMIT ${paginationValues.limit}
+      OFFSET ${(paginationValues.page - 1) * paginationValues.limit}`,
+    )
+
+    const reviews: UserReview[] = results.map((review: any) => {
+      return {
+        id: review.id,
+        rating: review.rating,
+        description: review.description,
+        created_at: review.createdAt,
+        user: {
+          user_id: review.user_id,
+          first_name: review.first_name,
+          last_name: review.last_name,
+          profile_picture_url: review.profile_picture_url,
+        },
+      }
+    })
+
+    if (reviews.length === 0) {
+      console.log('Reviews not found')
+      throw new HttpException(404, 'Reviews not found for the restaurant')
+    }
+
+    return reviews
+  } catch (error) {
+    if (error instanceof HttpException) {
+      throw error
+    }
+    console.error('Error getting reviews', error)
+    throw new HttpException(500, 'Error getting reviews')
   }
 }

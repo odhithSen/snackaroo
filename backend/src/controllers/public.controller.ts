@@ -7,6 +7,7 @@ import {
   getDishByDishId,
   getDishCategoriesByRestaurantId,
   getDishesByCategory,
+  getReviewsByRestaurantId,
 } from '../services/public.service'
 import { PaginationQuery } from '../models/query-interface'
 import { validatePaginationQuery } from '../utils/pagination-query-validation'
@@ -96,7 +97,6 @@ router.get(
   },
 )
 
-// TODO: Implement this endpoint so that it will return only a list of dish category names?
 router.get(
   '/restaurants/:restaurantId/dish-categories',
   async (req: Request, res: Response, next: NextFunction) => {
@@ -109,6 +109,34 @@ router.get(
       res.json({ status: 'success', dishCategories })
     } catch (error) {
       next(error)
+    }
+  },
+)
+
+router.get(
+  '/restaurants/:restaurantId/reviews',
+  async (
+    req: Request<{ restaurantId: string }, {}, {}, PaginationQuery>,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    const paginationValues = validatePaginationQuery(req.query)
+
+    if (paginationValues instanceof HttpException) {
+      next(paginationValues)
+    } else {
+      try {
+        const restaurantId = parseInt(req.params.restaurantId)
+        if (isNaN(restaurantId)) {
+          throw new HttpException(400, 'Invalid restaurant id')
+        }
+
+        const reviews = await getReviewsByRestaurantId(restaurantId, paginationValues)
+
+        res.json({ status: 'success', reviews })
+      } catch (error) {
+        next(error)
+      }
     }
   },
 )

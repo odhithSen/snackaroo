@@ -7,6 +7,7 @@ export interface RestaurantReviewRead {
   reviewer_id: number
   rating: number
   description?: string
+  createdAt?: Date
 }
 
 @Table({ tableName: 'restaurant_review', timestamps: true, initialAutoIncrement: '120000' })
@@ -37,6 +38,18 @@ export class RestaurantReview extends Model<RestaurantReviewRead> implements Res
     type: DataType.STRING(512),
   })
   description!: string
+
+  @Column({
+    type: DataType.DATE,
+    allowNull: false,
+  })
+  createdAt!: Date
+
+  @Column({
+    type: DataType.DATE,
+    allowNull: false,
+  })
+  updatedAt!: Date
 }
 
 export interface RestaurantReviewCreate {

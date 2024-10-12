@@ -1,5 +1,7 @@
 import { InferAttributes, InferCreationAttributes } from 'sequelize'
-import { Table, Column, Model, DataType } from 'sequelize-typescript'
+import { Table, Column, Model, DataType, BelongsToMany, HasMany } from 'sequelize-typescript'
+import { User } from './user.model'
+import { RestaurantReview } from './restaurant_review.model'
 
 export interface RestaurantRead {
   restaurant_id: number
@@ -67,6 +69,9 @@ export class Restaurant
     type: DataType.STRING(512),
   })
   notes!: string
+
+  // @BelongsToMany(() => User, () => RestaurantReview, 'reviewer_id', 'restaurant_id')
+  // reviewers!: Array<User & { RestaurantReview: RestaurantReview }>
 }
 
 export interface RestaurantCreate {

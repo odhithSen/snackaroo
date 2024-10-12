@@ -1,5 +1,7 @@
-import { InferAttributes, InferCreationAttributes } from 'sequelize'
-import { Table, Column, Model, DataType } from 'sequelize-typescript'
+import { Optional } from 'sequelize'
+import { Table, Column, Model, DataType, BelongsToMany, HasMany } from 'sequelize-typescript'
+import { RestaurantReview } from './restaurant_review.model'
+import { Restaurant } from './restaurant.model'
 
 export interface UserRead {
   user_id: number
@@ -8,13 +10,11 @@ export interface UserRead {
   email: string
   contact_number?: string
   profile_picture_url?: string
+  // restaurants?: Array<Restaurant & { RestaurantReview: RestaurantReview }>
 }
 
 @Table({ tableName: 'user', timestamps: true, initialAutoIncrement: '10000' })
-export class User
-  extends Model<InferAttributes<User>, InferCreationAttributes<User>>
-  implements UserRead
-{
+export class User extends Model<UserRead, UserCreate> implements UserRead {
   @Column({
     type: DataType.INTEGER,
     allowNull: false,
@@ -48,6 +48,9 @@ export class User
     type: DataType.STRING,
   })
   profile_picture_url!: string
+
+  // @BelongsToMany(() => Restaurant, () => RestaurantReview, 'restaurant_id', 'reviewer_id')
+  // restaurants!: Array<Restaurant & { RestaurantReview: RestaurantReview }>
 }
 
 export interface UserCreate {
