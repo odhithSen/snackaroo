@@ -77,6 +77,7 @@ export class Order
 }
 
 export interface OrderCreate {
+  order_id: number
   user_id: number
   restaurant_id: number
   order_total: number

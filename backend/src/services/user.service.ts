@@ -1,5 +1,9 @@
+import { Optional } from 'sequelize'
 import HttpException from '../models/http-exception.model'
+import { Order, OrderCreate } from '../models/order.model'
+import { OrderItem, OrderItemCreate } from '../models/order_item.model'
 import { RestaurantReview, RestaurantReviewCreate } from '../models/restaurant_review.model'
+import { NullishPropertiesOf } from 'sequelize/lib/utils'
 
 export async function addReview(
   review: RestaurantReviewCreate,
@@ -17,6 +21,46 @@ export async function addReview(
       throw new HttpException(400, 'Invalid review')
     } else {
       throw new HttpException(500, 'Error saving review')
+    }
+  }
+}
+
+export async function addOrder(order: OrderCreate): Promise<Order | HttpException> {
+  try {
+    const newOrder = Order.build(order)
+    return await newOrder.save()
+  } catch (error) {
+    console.error('Error saving order', error)
+    // @ts-ignore
+    if (error.name === 'SequelizeUniqueConstraintError') {
+      throw new HttpException(400, 'Order already exists')
+      // @ts-ignore
+    } else if (error.name === 'ValidationError') {
+      throw new HttpException(400, 'Invalid order')
+    } else {
+      throw new HttpException(500, 'Error saving order')
+    }
+  }
+}
+
+export async function addOrderItems(
+  orderItems: OrderItemCreate[],
+): Promise<OrderItem[] | HttpException> {
+  try {
+    const newOrderItems = await OrderItem.bulkCreate(
+      orderItems as Optional<OrderItem, NullishPropertiesOf<OrderItem>>[],
+    )
+    return newOrderItems
+  } catch (error) {
+    console.error('Error saving order items', error)
+    // @ts-ignore
+    if (error.name === 'SequelizeUniqueConstraintError') {
+      throw new HttpException(400, 'Order items already exist')
+      // @ts-ignore
+    } else if (error.name === 'ValidationError') {
+      throw new HttpException(400, 'Invalid order items')
+    } else {
+      throw new HttpException(500, 'Error saving order items')
     }
   }
 }
