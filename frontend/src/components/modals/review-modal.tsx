@@ -5,99 +5,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Star, ArrowUpDown, Laugh } from "lucide-react";
 import { ScrollArea } from "../ui/scroll-area";
 import { RestaurantReview } from "src/models/restaurant-review";
-
-// mock data
-const reviews: RestaurantReview[] = [
-  {
-    id: "1",
-    rating: 4,
-    date: "2 days ago",
-    description: "The food was great, but the delivery was a bit slow.",
-    user: {
-      user_id: 1,
-      first_name: "John",
-      last_name: "Doe",
-      profile_picture_url:
-        "https://loremflickr.com/320/320/food,restaurant?lock=8032802365950976",
-    },
-  },
-  {
-    id: "1",
-    rating: 4,
-    date: "2 days ago",
-    description: "The food was great, but the delivery was a bit slow.",
-    user: {
-      user_id: 1,
-      first_name: "John",
-      last_name: "Doe",
-    },
-  },
-  {
-    id: "1",
-    rating: 4,
-    date: "2 days ago",
-    description: "The food was great, but the delivery was a bit slow.",
-    tags: ["Vegan", "Vegetarian"],
-    user: {
-      user_id: 1,
-      first_name: "John",
-      last_name: "Doe",
-      profile_picture_url: "https://randomuser.me/api/portraits",
-    },
-  },
-  {
-    id: "1",
-    rating: 4,
-    date: "2 days ago",
-    description: "The food was great, but the delivery was a bit slow.",
-    tags: ["Vegan", "Vegetarian"],
-    user: {
-      user_id: 1,
-      first_name: "John",
-      last_name: "Doe",
-      profile_picture_url: "https://randomuser.me/api/portraits",
-    },
-  },
-  {
-    id: "1",
-    rating: 4,
-    date: "2 days ago",
-    description: "The food was great, but the delivery was a bit slow.",
-    tags: ["Vegan", "Vegetarian"],
-    user: {
-      user_id: 1,
-      first_name: "John",
-      last_name: "Doe",
-      profile_picture_url: "https://randomuser.me/api/portraits",
-    },
-  },
-  {
-    id: "1",
-    rating: 4,
-    date: "2 days ago",
-    description: "The food was great, but the delivery was a bit slow.",
-    tags: ["Vegan", "Vegetarian"],
-    user: {
-      user_id: 1,
-      first_name: "John",
-      last_name: "Doe",
-      profile_picture_url: "https://randomuser.me/api/portraits",
-    },
-  },
-  {
-    id: "1",
-    rating: 4,
-    date: "2 days ago",
-    description: "The food was great, but the delivery was a bit slow.",
-    tags: ["Vegan", "Vegetarian"],
-    user: {
-      user_id: 1,
-      first_name: "John",
-      last_name: "Doe",
-      profile_picture_url: "https://randomuser.me/api/portraits",
-    },
-  },
-];
+import { useApi } from "src/hooks/useApi";
+import { PageLoader } from "../page-loader";
 
 interface ReviewModalProps {
   restaurantId: number;
@@ -110,6 +19,22 @@ const ReviewModal: React.FC<ReviewModalProps> = ({
   isOpen,
   onClose,
 }) => {
+  const reviewRequest = useApi({
+    endpoint: `public/restaurants/${restaurantId}/reviews?page=1&limit=999`,
+    isPublic: true,
+    dependencies: [],
+  });
+
+  // if (reviewRequest.loading) {
+  //   return <PageLoader />;
+  // }
+
+  if (reviewRequest.error) {
+    console.error("Error getting reviews", reviewRequest.error.message);
+  }
+
+  const reviews: RestaurantReview[] = reviewRequest.data?.reviews ?? [];
+
   const averageRating =
     reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length;
   const roundedRating = Math.round(averageRating * 10) / 10;
