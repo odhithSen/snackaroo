@@ -42,10 +42,11 @@ module.exports = {
         )
 
         // Generate order data
+        const temp_order_items = []
         const orderTotal = selectedDishes.reduce((sum, dish) => {
           const quantity = faker.number.int({ min: 1, max: 5 })
           const lineTotal = parseFloat(dish.base_price) * quantity
-          orderItems.push({
+          temp_order_items.push({
             order_id: null, // Placeholder, to be updated with order_id later
             dish_id: dish.dish_id,
             quantity,
@@ -55,6 +56,7 @@ module.exports = {
           })
           return sum + lineTotal
         }, 0)
+        orderItems.push(temp_order_items)
 
         const orderData = {
           order_id: 0,
@@ -84,19 +86,17 @@ module.exports = {
       },
     )
 
-    console.log('insertedOrderIds', insertedOrderIds[1])
+    console.log('insertedOrderIds', insertedOrderIds.length)
 
-    insertedOrderIds.forEach((order, index) => {
-      const startIdx = (index * orderItems.length) / insertedOrderIds.length
-      const endIdx = startIdx + orderItems.length / insertedOrderIds.length
-      for (let i = startIdx; i < endIdx; i++) {
-        orderItems[i].order_id = order.order_id
-      }
-    })
+    for (let i = 0; i < insertedOrderIds.length; i++) {
+      orderItems[i].forEach(orderItem => {
+        orderItem.order_id = insertedOrderIds[i].order_id
+      })
+    }
 
-    console.log('orderItems', orderItems[0])
+    console.log('orderItems', orderItems.flat()[1])
 
-    await queryInterface.bulkInsert('order_item', orderItems)
+    await queryInterface.bulkInsert('order_item', orderItems.flat())
   },
 
   async down(queryInterface, Sequelize) {
