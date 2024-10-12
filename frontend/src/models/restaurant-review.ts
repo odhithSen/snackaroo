@@ -13,6 +13,6 @@ export interface RestaurantReview {
 }
 
 export interface ReviewsMetaData {
-  totalReviews: number;
-  averageRating: number;
+  review_count: number;
+  average_rating: number;
 }

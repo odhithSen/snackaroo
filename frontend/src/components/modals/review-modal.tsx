@@ -6,7 +6,8 @@ import { Star, ArrowUpDown, Laugh } from "lucide-react";
 import { ScrollArea } from "../ui/scroll-area";
 import { RestaurantReview } from "src/models/restaurant-review";
 import { useApi } from "src/hooks/useApi";
-import { PageLoader } from "../page-loader";
+import Swal from "sweetalert2";
+// import { PageLoader } from "../page-loader";
 
 interface ReviewModalProps {
   restaurantId: number;
@@ -31,6 +32,11 @@ const ReviewModal: React.FC<ReviewModalProps> = ({
 
   if (reviewRequest.error) {
     console.error("Error getting reviews", reviewRequest.error.message);
+    Swal.fire({
+      title: "Error!",
+      text: "An Error Occurred while fetching reviews",
+      icon: "error",
+    });
   }
 
   const reviews: RestaurantReview[] = reviewRequest.data?.reviews ?? [];

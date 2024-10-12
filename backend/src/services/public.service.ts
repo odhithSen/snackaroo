@@ -287,3 +287,48 @@ export async function getReviewsByRestaurantId(
     throw new HttpException(500, 'Error getting reviews')
   }
 }
+
+export interface ReviewsMetadata {
+  review_count: number
+  average_rating: number
+}
+
+export async function getReviewsMetadataByRestaurantId(
+  restaurantId: number,
+): Promise<ReviewsMetadata | HttpException> {
+  try {
+    const restaurant = await Restaurant.findByPk(restaurantId)
+    if (restaurant === null) {
+      console.log('Restaurant not found')
+      throw new HttpException(404, 'Restaurant not found')
+    }
+
+    const [results, metadata]: [any[], any] = await sequelize.query(
+      `SELECT COUNT(*) as review_count, AVG(rating) as average_rating
+      FROM restaurant_review RW
+      WHERE RW.restaurant_id = ${restaurantId} 
+    `,
+    )
+
+    let reviewsMetadata: ReviewsMetadata
+    if (results.length === 0) {
+      reviewsMetadata = {
+        review_count: 0,
+        average_rating: 0,
+      }
+      return reviewsMetadata
+    }
+    reviewsMetadata = {
+      review_count: results[0].review_count,
+      average_rating: parseFloat(results[0].average_rating),
+    }
+
+    return reviewsMetadata
+  } catch (error) {
+    if (error instanceof HttpException) {
+      throw error
+    }
+    console.error('Error getting reviews metadata', error)
+    throw new HttpException(500, 'Error getting reviews metadata')
+  }
+}

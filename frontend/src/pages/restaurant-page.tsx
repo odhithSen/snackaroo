@@ -15,6 +15,8 @@ import RestaurantInfoModal from "src/components/modals/restaurant-info-modal";
 import ReviewModal from "src/components/modals/review-modal";
 import { useApi } from "src/hooks/useApi";
 import { PageLoader } from "src/components/page-loader";
+import { ReviewsMetaData } from "src/models/restaurant-review";
+import Swal from "sweetalert2";
 
 export const RestaurantPage: React.FC = () => {
   const navigate = useNavigate();
@@ -96,9 +98,39 @@ export const RestaurantPage: React.FC = () => {
 
   if (dishesError) {
     console.error("Error fetching dishes", dishesError);
+    Swal.fire({
+      title: "Error!",
+      text: "An Error Occurred while fetching dishes",
+      icon: "error",
+    });
   }
 
-  if (restaurantLoading || dishCategoriesLoading || dishesLoading) {
+  const reviewMetadataState = useApi({
+    endpoint: `/public/restaurants/${restaurantId}/reviews-metadata`,
+    isPublic: true,
+    dependencies: [restaurantId],
+  });
+
+  const reviewMetadataLoading = reviewMetadataState.loading;
+  const reviewMetadataError = reviewMetadataState.error;
+  const reviewMetadata: ReviewsMetaData =
+    (reviewMetadataState.data?.reviewsMetadata as ReviewsMetaData) ?? {};
+
+  if (reviewMetadataError) {
+    console.error("Error fetching review metadata", reviewMetadataError);
+    Swal.fire({
+      title: "Error!",
+      text: "An Error Occurred while fetching review metadata",
+      icon: "error",
+    });
+  }
+
+  if (
+    restaurantLoading ||
+    dishCategoriesLoading ||
+    dishesLoading ||
+    reviewMetadataLoading
+  ) {
     return <PageLoader />;
   }
 
@@ -167,7 +199,6 @@ export const RestaurantPage: React.FC = () => {
                     </p>
                   </div>
 
-                  {/* Can render the reviews and rating from thr reviews api */}
                   <div
                     className="mb-4"
                     onClick={(e) => {
@@ -182,12 +213,17 @@ export const RestaurantPage: React.FC = () => {
                           strokeWidth={0}
                           className="h-6 w-6 mr-2"
                         />
-                        <span className="text-[#4d7c1b]">4.7 Excellent</span>
+                        <span className="text-[#4d7c1b]">
+                          {reviewMetadata?.average_rating?.toFixed(1)} {"  "}
+                          {reviewMetadata?.average_rating > 4.5
+                            ? "Excellent"
+                            : "Good"}
+                        </span>
                       </div>
                       <ChevronRight className="w-5 h-5 text-teal-500 ml-24" />
                     </button>
                     <p className="text-sm text-gray-500 mt-1 ml-9">
-                      See all 500 reviews
+                      See all {reviewMetadata?.review_count} reviews
                     </p>
                   </div>
                 </div>

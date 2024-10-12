@@ -8,6 +8,7 @@ import {
   getDishCategoriesByRestaurantId,
   getDishesByCategory,
   getReviewsByRestaurantId,
+  getReviewsMetadataByRestaurantId,
 } from '../services/public.service'
 import { PaginationQuery } from '../models/query-interface'
 import { validatePaginationQuery } from '../utils/pagination-query-validation'
@@ -137,6 +138,23 @@ router.get(
       } catch (error) {
         next(error)
       }
+    }
+  },
+)
+
+router.get(
+  '/restaurants/:restaurantId/reviews-metadata',
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const restaurantId = parseInt(req.params.restaurantId)
+      if (isNaN(restaurantId)) {
+        throw new HttpException(400, 'Invalid restaurant id')
+      }
+
+      const reviewsMetadata = await getReviewsMetadataByRestaurantId(restaurantId)
+      res.json({ status: 'success', reviewsMetadata })
+    } catch (error) {
+      next(error)
     }
   },
 )
