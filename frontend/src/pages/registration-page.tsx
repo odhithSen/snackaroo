@@ -13,6 +13,7 @@ import { useAccessToken } from "src/hooks/useAccessToken";
 import { apiCall } from "src/utils/api-call";
 import { useApi } from "src/hooks/useApi";
 import { useNavigate } from "react-router-dom";
+import { PageLoader } from "src/components/page-loader";
 
 interface FormData {
   first_name: string;
@@ -44,12 +45,18 @@ export const RegistrationPage: React.FC = () => {
   const userInfo = useApi({
     endpoint: "user-info/me",
   });
-  // TODO: handle already registered state
+  // TODO: return back to the original page if user is already registered
   if (userInfo.data) {
     console.log("User already registered:", userInfo.data);
     navigate("/");
   }
-  userInfo.error && console.error("Error getting user info", userInfo.error);
+  if (userInfo.loading) {
+    return <PageLoader />;
+  }
+
+  // if (userInfo.error) {
+  //   console.error("Error getting user info", userInfo.error.message);
+  // }
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -104,6 +111,8 @@ export const RegistrationPage: React.FC = () => {
           contact_number: "",
           profile_picture_url: "",
         });
+        // TODO: show success message and navigate to the original page
+        navigate("/");
       } catch (error) {
         console.error("Error registering user:", error);
       }

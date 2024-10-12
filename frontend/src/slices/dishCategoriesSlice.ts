@@ -1,5 +1,8 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
+import { config } from "src/config";
+
+const backendBaseUrl = config.BACKEND_URL;
 
 export interface RestaurantDishCategory {
   dish_category_id: number;
@@ -28,7 +31,7 @@ export const fetchDishCategories = createAsyncThunk(
   "restaurants/fetchDishCategories",
   async ({ restaurantID }: { restaurantID: number }) => {
     const response = await axios.get<RestaurantDishCategoriesResponse>(
-      `http://localhost:8080/api/public/restaurants/${restaurantID}/dish-categories`
+      `${backendBaseUrl}/public/restaurants/${restaurantID}/dish-categories`
     );
     return response.data.dishCategories;
   }

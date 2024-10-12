@@ -1,5 +1,6 @@
-import { Auth0Provider, AppState } from "@auth0/auth0-react";
 import React, { PropsWithChildren } from "react";
+import { config } from "./config";
+import { Auth0Provider, AppState } from "@auth0/auth0-react";
 import { useNavigate } from "react-router-dom";
 
 interface Auth0ProviderWithNavigateProps {
@@ -11,25 +12,18 @@ export const Auth0ProviderWithNavigate = ({
 }: PropsWithChildren<Auth0ProviderWithNavigateProps>): JSX.Element | null => {
   const navigate = useNavigate();
 
-  const domain = process.env.REACT_APP_AUTH0_DOMAIN;
-  const clientId = process.env.REACT_APP_AUTH0_CLIENT_ID;
-  const redirectUri = process.env.REACT_APP_AUTH0_CALLBACK_URL;
-
   const onRedirectCallback = (appState?: AppState) => {
-    navigate(appState?.returnTo || window.location.pathname);
+    // navigate(appState?.returnTo || window.location.pathname);
+    navigate("/register");
   };
-
-  if (!(domain && clientId && redirectUri)) {
-    return null;
-  }
 
   return (
     <Auth0Provider
-      domain={domain}
-      clientId={clientId}
+      domain={config.AUTH0_DOMAIN}
+      clientId={config.AUTH0_CLIENT_ID}
       authorizationParams={{
-        redirect_uri: redirectUri,
-        audience: "https://user-api.example.com",
+        redirect_uri: config.AUTH0_CALLBACK_URL,
+        audience: config.API_AUTH0_AUDIENCE,
         scope: "openid profile email",
       }}
       onRedirectCallback={onRedirectCallback}

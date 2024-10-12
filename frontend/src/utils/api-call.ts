@@ -1,6 +1,7 @@
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
+import { config } from "src/config";
 
-const backendBaseUrl = process.env.REACT_APP_BACKEND_URL;
+const backendBaseUrl = config.BACKEND_URL;
 
 interface ApiCall {
   endpoint: string;

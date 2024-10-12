@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
+import { config } from "src/config";
 
 const useAccessToken = () => {
   const { loginWithRedirect, getAccessTokenSilently } = useAuth0();
@@ -23,7 +24,7 @@ const useAccessToken = () => {
         setAccessToken(
           await getAccessTokenSilently({
             authorizationParams: {
-              audience: "https://user-api.example.com",
+              audience: config.API_AUTH0_AUDIENCE,
               scope: "openid profile email",
             },
           })

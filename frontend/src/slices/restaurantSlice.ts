@@ -1,6 +1,9 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { Restaurant } from "./restaurantsSlice";
+import { config } from "src/config";
+
+const backendBaseUrl = config.BACKEND_URL;
 
 interface RestaurantResponse {
   status: string;
@@ -23,7 +26,7 @@ export const fetchRestaurant = createAsyncThunk(
   "restaurants/fetchRestaurant",
   async ({ restaurantID }: { restaurantID: number }) => {
     const response = await axios.get<RestaurantResponse>(
-      `http://localhost:8080/api/public/restaurants/${restaurantID}`
+      `${backendBaseUrl}/public/restaurants/${restaurantID}`
     );
     return response.data.restaurant;
   }

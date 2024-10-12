@@ -14,6 +14,7 @@ import { BasketItem } from "src/models/basket-item";
 import RestaurantInfoModal from "src/components/modals/restaurant-info-modal";
 import ReviewModal from "src/components/modals/review-modal";
 import { useApi } from "src/hooks/useApi";
+import { PageLoader } from "src/components/page-loader";
 
 export const RestaurantPage: React.FC = () => {
   const navigate = useNavigate();
@@ -97,14 +98,8 @@ export const RestaurantPage: React.FC = () => {
     console.error("Error fetching dishes", dishesError);
   }
 
-  if (dishesLoading) {
-    console.log("Loading dishes...");
-  } else {
-    console.log("Dishes loaded");
-  }
-
-  if (restaurantLoading || dishCategoriesLoading) {
-    return <div>Loading...</div>;
+  if (restaurantLoading || dishCategoriesLoading || dishesLoading) {
+    return <PageLoader />;
   }
 
   if (restaurantError) {

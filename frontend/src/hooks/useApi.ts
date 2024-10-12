@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
+import { config } from "src/config";
 
-const backendBaseUrl = process.env.REACT_APP_BACKEND_URL;
+const backendBaseUrl = config.BACKEND_URL;
 
 interface ApiHookProps {
   endpoint: string;
@@ -25,7 +26,8 @@ const useApi = ({
   const [error, setError] = useState<AxiosError | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const { loginWithRedirect, getAccessTokenSilently } = useAuth0();
+  const { loginWithRedirect, getAccessTokenSilently, isAuthenticated } =
+    useAuth0();
 
   const redirectToLogin = async () => {
     await loginWithRedirect({
@@ -45,23 +47,23 @@ const useApi = ({
         accessToken = shouldGetAccessToken
           ? await getAccessTokenSilently({
               authorizationParams: {
-                audience: "https://user-api.example.com",
+                audience: config.API_AUTH0_AUDIENCE,
                 scope: "openid profile email",
               },
             })
           : "";
       } catch (error) {
-        console.error(
-          "Error getting access token. Redirecting to login...",
-          error
-        );
-        // redirectToLogin();
+        console.error("Error getting access token", error);
+        if (!isAuthenticated) {
+          console.log("User is not authenticated. Redirecting to login...");
+          redirectToLogin();
+        }
         return;
       }
 
       setLoading(true);
 
-      const config: AxiosRequestConfig = {
+      const requestConfig: AxiosRequestConfig = {
         method,
         url: `${backendBaseUrl}/${endpoint}`,
         headers: {
@@ -72,7 +74,7 @@ const useApi = ({
       };
 
       try {
-        const response: AxiosResponse = await axios(config);
+        const response: AxiosResponse = await axios(requestConfig);
         setData(response.data);
       } catch (error) {
         setError(error as AxiosError);
