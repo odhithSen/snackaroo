@@ -1,5 +1,12 @@
 import { NextFunction, Request, Response, Router } from 'express'
-import { addOrder, addOrderItems, addReview, getOrderByOrderId } from '../services/user.service'
+import {
+  addOrder,
+  addOrderItems,
+  addReview,
+  getOrderByOrderId,
+  getOrderByUserId,
+  getUserOrdersByStatus,
+} from '../services/user.service'
 import { RestaurantReviewCreate } from '../models/restaurant_review.model'
 import Ajv, { JSONSchemaType } from 'ajv'
 import addFormats from 'ajv-formats'
@@ -8,6 +15,8 @@ import { OrderItemCreate } from '../models/order_item.model'
 import { OrderCreate } from '../models/order.model'
 import { OrderStatus } from '../enums/order-status'
 import { getDishByDishId } from '../services/public.service'
+import { PaginationQuery } from '../models/query-interface'
+import { PaginationValues, validatePaginationQuery } from '../utils/pagination-query-validation'
 
 const ajv = new Ajv()
 addFormats(ajv)
@@ -168,5 +177,35 @@ router.get('/orders/:orderId', async (req: Request, res: Response, next: NextFun
     next(error)
   }
 })
+
+router.get(
+  '/orders',
+  async (
+    req: Request<{}, {}, {}, PaginationQuery & { status?: string }>,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    const userId = req.user.user_id
+    try {
+      const paginationValues = validatePaginationQuery(req.query)
+      const { status } = req.query
+
+      if (status && !Object.values(OrderStatus).includes(status as OrderStatus)) {
+        throw new HttpException(400, 'Invalid order status')
+      }
+
+      let orders
+      if (status) {
+        orders = await getUserOrdersByStatus(userId, status, paginationValues)
+      } else {
+        orders = await getOrderByUserId(userId, paginationValues)
+      }
+
+      res.status(200).json({ status: 'success', orders })
+    } catch (error) {
+      next(error)
+    }
+  },
+)
 
 export default router

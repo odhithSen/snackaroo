@@ -4,6 +4,8 @@ import { Order, OrderCreate } from '../models/order.model'
 import { OrderItem, OrderItemCreate } from '../models/order_item.model'
 import { RestaurantReview, RestaurantReviewCreate } from '../models/restaurant_review.model'
 import { NullishPropertiesOf } from 'sequelize/lib/utils'
+import { PaginationQuery } from '../models/query-interface'
+import { PaginationValues } from '../utils/pagination-query-validation'
 
 export async function addReview(review: RestaurantReviewCreate): Promise<RestaurantReview> {
   try {
@@ -78,5 +80,40 @@ export async function getOrderByOrderId(orderId: number): Promise<Order> {
     }
     console.error('Error getting order details', error)
     throw new HttpException(500, 'Error getting order details')
+  }
+}
+
+export async function getUserOrdersByStatus(
+  userId: number,
+  status: string,
+  paginationValues: PaginationValues,
+): Promise<Order[]> {
+  try {
+    const orders = await Order.findAll({
+      where: { user_id: userId, order_status: status },
+      limit: paginationValues.limit,
+      offset: (paginationValues.page - 1) * paginationValues.limit,
+    })
+    return orders
+  } catch (error) {
+    console.error('Error getting user orders by status', error)
+    throw new HttpException(500, 'Error getting user orders by status')
+  }
+}
+
+export async function getOrderByUserId(
+  userId: number,
+  paginationValues: PaginationValues,
+): Promise<Order[]> {
+  try {
+    const orders = await Order.findAll({
+      where: { user_id: userId },
+      limit: paginationValues.limit,
+      offset: (paginationValues.page - 1) * paginationValues.limit,
+    })
+    return orders
+  } catch (error) {
+    console.error('Error getting user orders', error)
+    throw new HttpException(500, 'Error getting user orders')
   }
 }
