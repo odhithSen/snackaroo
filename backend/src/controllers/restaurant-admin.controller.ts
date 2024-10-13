@@ -5,6 +5,7 @@ import addFormats from 'ajv-formats'
 import {
   addDishCategory,
   addDishItem,
+  getAverageOrderValue,
   getOrderByRestaurantId,
   getRestaurantIdByAdmin,
   getRestaurantOrdersByStatus,
@@ -289,6 +290,33 @@ router.get(
       const topSellingItems = await getTopSellingItems(restaurant.restaurant_id, criteria)
 
       res.status(200).json({ status: 'success', topSellingItems })
+    } catch (error) {
+      next(error)
+    }
+  },
+)
+
+router.get(
+  '/reports/average-order-value',
+  async (
+    req: Request<{}, {}, {}, { from?: string; to?: string }>,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    const restaurant_admin = req.user.user_id
+    try {
+      const { from, to } = req.query
+      const { fromDate, toDate } = validateDateRange(from, to)
+
+      const restaurant = await getRestaurantIdByAdmin(restaurant_admin)
+
+      const averageOrderValue = await getAverageOrderValue(
+        restaurant.restaurant_id,
+        fromDate,
+        toDate,
+      )
+
+      res.status(200).json({ status: 'success', averageOrderValue })
     } catch (error) {
       next(error)
     }

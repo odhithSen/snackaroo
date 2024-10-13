@@ -292,3 +292,28 @@ function getSalesQuery(restaurantId: number, criteria: string) {
       return ''
   }
 }
+
+// Get average order value for an order between provided dates for a restaurant
+export async function getAverageOrderValue(
+  restaurantId: number,
+  fromDate: Date,
+  toDate: Date,
+): Promise<any> {
+  try {
+    const [results, metadata] = await sequelize.query(
+      `SELECT
+        AVG(O.order_total) AS average_order_value,
+        COUNT(O.order_id) AS total_orders
+        FROM \`order\` O
+        WHERE O.order_status = 'DELIVERED' 
+        AND O.restaurant_id  = ${restaurantId}
+        AND O.order_time BETWEEN '${fromDate.toISOString()}' AND '${toDate.toISOString()}'; 
+        `,
+    )
+
+    return results
+  } catch (error) {
+    console.error(`Error getting average order value report`, error)
+    throw new HttpException(500, `Error getting average order value report`)
+  }
+}
