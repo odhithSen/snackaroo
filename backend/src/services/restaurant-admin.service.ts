@@ -17,6 +17,7 @@ import {
 } from '../models/restaurant_dish_category.model'
 import { PaginationValues } from '../utils/pagination-query-validation'
 import { ReportRange } from '../enums/report-range'
+import { SalesCriteria } from '../enums/sales-criteria'
 
 export async function getRestaurantIdByAdmin(id: number): Promise<RestaurantAdminRead> {
   try {
@@ -239,6 +240,54 @@ function getReportQuery(restaurantId: number, fromDate: Date, toDate: Date, grou
             GROUP BY YEAR(O.order_time), MONTH(O.order_time)
             ORDER BY YEAR(O.order_time), MONTH(O.order_time)
             `
+    default:
+      return ''
+  }
+}
+
+// Get top selling items for a restaurant according to the provided criteria
+export async function getTopSellingItems(restaurantId: number, criteria: string): Promise<any> {
+  try {
+    const [results, metadata] = await sequelize.query(getSalesQuery(restaurantId, criteria))
+
+    return results
+  } catch (error) {
+    console.error(`Error getting ${criteria} based sales report`, error)
+    throw new HttpException(500, `Error getting ${criteria} based sales report`)
+  }
+}
+
+function getSalesQuery(restaurantId: number, criteria: string) {
+  switch (criteria) {
+    case SalesCriteria.ORDERS:
+      return `SELECT
+            DI.dish_name,
+            OI.dish_id,
+            COUNT(OI.order_id) AS number_of_orders,
+            SUM(OI.quantity) AS total_quantity_sold
+            FROM order_item OI
+            JOIN \`order\` O ON OI.order_id = O.order_id
+            JOIN restaurant_dish_item DI ON OI.dish_id = DI.dish_id
+            WHERE O.restaurant_id = ${restaurantId} AND O.order_status = 'DELIVERED'
+            GROUP BY DI.dish_name, DI.dish_id
+            ORDER BY number_of_orders DESC, total_quantity_sold DESC
+            LIMIT 10;
+        `
+    case SalesCriteria.REVENUE:
+      return `SELECT
+            DI.dish_name,
+            OI.dish_id,
+            COUNT(OI.order_id) AS number_of_orders,
+            SUM(OI.quantity) AS total_quantity_sold,
+            SUM(OI.line_total) AS total_revenue
+            FROM order_item OI
+            JOIN \`order\` O ON OI.order_id = O.order_id
+            JOIN restaurant_dish_item DI ON OI.dish_id = DI.dish_id
+            WHERE O.restaurant_id = ${restaurantId} AND O.order_status = 'DELIVERED'
+            GROUP BY DI.dish_name, DI.dish_id
+            ORDER BY total_revenue DESC, total_quantity_sold DESC
+            LIMIT 10;
+        `
     default:
       return ''
   }

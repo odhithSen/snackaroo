@@ -10,6 +10,7 @@ import {
   getRestaurantOrdersByStatus,
   getSalesReport,
   getSalesTotalReport,
+  getTopSellingItems,
   updateOrderStatus,
 } from '../services/restaurant-admin.service'
 import { RestaurantDishItemCreate } from '../models/restaurant-dish-item.model'
@@ -20,6 +21,7 @@ import { PaginationQuery } from '../models/query-interface'
 import { validatePaginationQuery } from '../utils/pagination-query-validation'
 import { ReportRange } from '../enums/report-range'
 import { validateDateRange } from '../utils/date-range-validation'
+import { SalesCriteria } from '../enums/sales-criteria'
 
 const ajv = new Ajv()
 addFormats(ajv)
@@ -266,6 +268,27 @@ router.get(
       const salesReport = await getSalesTotalReport(restaurant.restaurant_id, fromDate, toDate)
 
       res.status(200).json({ status: 'success', salesReport })
+    } catch (error) {
+      next(error)
+    }
+  },
+)
+
+router.get(
+  '/reports/top-selling-items',
+  async (req: Request<{}, {}, {}, { criteria?: string }>, res: Response, next: NextFunction) => {
+    const restaurant_admin = req.user.user_id
+    try {
+      const { criteria } = req.query
+      if (!criteria || !Object.values(SalesCriteria).includes(criteria as SalesCriteria)) {
+        throw new HttpException(400, 'Invalid criteria parameter')
+      }
+
+      const restaurant = await getRestaurantIdByAdmin(restaurant_admin)
+
+      const topSellingItems = await getTopSellingItems(restaurant.restaurant_id, criteria)
+
+      res.status(200).json({ status: 'success', topSellingItems })
     } catch (error) {
       next(error)
     }
