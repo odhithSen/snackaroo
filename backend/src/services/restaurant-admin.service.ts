@@ -1,3 +1,6 @@
+import { Op } from 'sequelize'
+import { Sequelize } from 'sequelize-typescript'
+import { sequelize } from '../models'
 import { OrderStatus } from '../enums/order-status'
 import HttpException from '../models/http-exception.model'
 import { Order } from '../models/order.model'
@@ -13,6 +16,7 @@ import {
   RestaurantDishCategoryRead,
 } from '../models/restaurant_dish_category.model'
 import { PaginationValues } from '../utils/pagination-query-validation'
+import { ReportRange } from '../enums/report-range'
 
 export async function getRestaurantIdByAdmin(id: number): Promise<RestaurantAdminRead> {
   try {
@@ -148,5 +152,94 @@ export async function getOrderByRestaurantId(
   } catch (error) {
     console.error('Error getting restaurant orders', error)
     throw new HttpException(500, 'Error getting restaurant orders')
+  }
+}
+
+// Report functions
+// Get sales report with no of completed orders and total sales, between from date to to date for a restaurant
+export async function getSalesTotalReport(
+  restaurantId: number,
+  fromDate: Date,
+  toDate: Date,
+): Promise<{ total_sales: number; total_orders: number }> {
+  try {
+    const orders = await Order.findAll({
+      where: {
+        restaurant_id: restaurantId,
+        order_status: OrderStatus.DELIVERED,
+        order_time: {
+          [Op.between]: [fromDate, toDate],
+        },
+      },
+    })
+    //@ts-ignore
+    const total_sales = orders.reduce((acc, order) => acc + parseFloat(order.order_total), 0)
+    return { total_sales, total_orders: orders.length }
+  } catch (error) {
+    console.error('Error getting sales report', error)
+    throw new HttpException(500, 'Error getting sales report')
+  }
+}
+
+export async function getSalesReport(
+  restaurantId: number,
+  fromDate: Date,
+  toDate: Date,
+  grouping: string,
+): Promise<any> {
+  try {
+    const [results, metadata] = await sequelize.query(
+      getReportQuery(restaurantId, fromDate, toDate, grouping),
+    )
+
+    return results
+  } catch (error) {
+    console.error(`Error getting ${grouping} sales report`, error)
+    throw new HttpException(500, `Error getting ${grouping} sales report`)
+  }
+}
+
+function getReportQuery(restaurantId: number, fromDate: Date, toDate: Date, grouping: string) {
+  switch (grouping) {
+    case ReportRange.DAILY:
+      return `SELECT 
+            DATE(O.order_time) as date, 
+            SUM(O.order_total) as total_sales, 
+            COUNT(*) as total_orders
+            FROM \`order\` O
+            WHERE O.restaurant_id = ${restaurantId}
+            AND O.order_status = 'DELIVERED'
+            AND O.order_time BETWEEN '${fromDate.toISOString()}' AND '${toDate.toISOString()}'
+            GROUP BY DATE(O.order_time)
+            ORDER BY DATE(O.order_time);
+          `
+    case ReportRange.WEEKLY:
+      return `SELECT 
+            YEAR(O.order_time) as year, 
+            WEEK(O.order_time) as week, 
+            SUM(O.order_total) as total_sales, 
+            COUNT(*) as total_orders
+            FROM \`order\` O
+            WHERE O.restaurant_id = ${restaurantId}
+            AND O.order_status = 'DELIVERED'
+            AND O.order_time BETWEEN '${fromDate.toISOString()}' AND '${toDate.toISOString()}'
+            GROUP BY YEAR(O.order_time), WEEK(O.order_time)
+            ORDER BY YEAR(O.order_time), WEEK(O.order_time)
+      `
+    case ReportRange.MONTHLY:
+      return `SELECT 
+            YEAR(O.order_time) as year, 
+            MONTH(O.order_time) as month, 
+            SUM(O.order_total) as total_sales, 
+            COUNT(*) as total_orders
+            FROM \`order\` O
+            WHERE O.restaurant_id = ${restaurantId}
+            AND O.order_status = 'DELIVERED'
+            AND O.order_time BETWEEN '${fromDate.toISOString()}' AND '${toDate.toISOString()}'
+            GROUP BY YEAR(O.order_time), MONTH(O.order_time)
+            ORDER BY YEAR(O.order_time), MONTH(O.order_time)
+            `
+    default:
+      return ''
   }
 }

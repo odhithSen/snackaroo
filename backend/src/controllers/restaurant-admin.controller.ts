@@ -8,15 +8,18 @@ import {
   getOrderByRestaurantId,
   getRestaurantIdByAdmin,
   getRestaurantOrdersByStatus,
+  getSalesReport,
+  getSalesTotalReport,
   updateOrderStatus,
 } from '../services/restaurant-admin.service'
 import { RestaurantDishItemCreate } from '../models/restaurant-dish-item.model'
 import { RestaurantDishCategoryCreate } from '../models/restaurant_dish_category.model'
 import { OrderStatus } from '../enums/order-status'
-import { get } from 'http'
 import { getOrderByOrderId } from '../services/user.service'
 import { PaginationQuery } from '../models/query-interface'
 import { validatePaginationQuery } from '../utils/pagination-query-validation'
+import { ReportRange } from '../enums/report-range'
+import { validateDateRange } from '../utils/date-range-validation'
 
 const ajv = new Ajv()
 addFormats(ajv)
@@ -213,6 +216,56 @@ router.get(
       }
 
       res.status(200).json({ status: 'success', orders })
+    } catch (error) {
+      next(error)
+    }
+  },
+)
+
+router.get(
+  '/reports/sales',
+  async (
+    req: Request<{}, {}, {}, { from?: string; to?: string; grouping?: string }>,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    const restaurant_admin = req.user.user_id
+    try {
+      const { from, to, grouping } = req.query
+      const { fromDate, toDate } = validateDateRange(from, to)
+
+      if (!grouping || !Object.values(ReportRange).includes(grouping as ReportRange)) {
+        throw new HttpException(400, 'Invalid grouping parameter')
+      }
+
+      const restaurant = await getRestaurantIdByAdmin(restaurant_admin)
+
+      const salesReport = await getSalesReport(restaurant.restaurant_id, fromDate, toDate, grouping)
+
+      res.status(200).json({ status: 'success', salesReport })
+    } catch (error) {
+      next(error)
+    }
+  },
+)
+
+router.get(
+  '/reports/total-sales',
+  async (
+    req: Request<{}, {}, {}, { from?: string; to?: string }>,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    const restaurant_admin = req.user.user_id
+    try {
+      const { from, to } = req.query
+      const { fromDate, toDate } = validateDateRange(from, to)
+
+      const restaurant = await getRestaurantIdByAdmin(restaurant_admin)
+
+      const salesReport = await getSalesTotalReport(restaurant.restaurant_id, fromDate, toDate)
+
+      res.status(200).json({ status: 'success', salesReport })
     } catch (error) {
       next(error)
     }
