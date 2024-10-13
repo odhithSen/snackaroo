@@ -5,7 +5,6 @@ const { Op } = require('sequelize')
 
 module.exports = {
   async up(queryInterface, Sequelize) {
-    // Fetch all users and restaurants
     const users = await queryInterface.sequelize.query(`SELECT user_id FROM user`, {
       type: Sequelize.QueryTypes.SELECT,
     })
@@ -20,28 +19,22 @@ module.exports = {
       { type: Sequelize.QueryTypes.SELECT },
     )
 
-    // Possible order statuses
     const orderStatuses = ['PENDING', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED']
 
-    // Create an array to store all orders and order items
     const orders = []
     const orderItems = []
 
-    // For each user, create an order for each restaurant
     users.forEach(user => {
       restaurants.forEach(restaurant => {
-        // Get dishes for this restaurant
         const restaurantDishes = dishes.filter(
           dish => dish.restaurant_id === restaurant.restaurant_id,
         )
 
-        // Pick 1-3 random dishes from the restaurant
         const selectedDishes = faker.helpers.arrayElements(
           restaurantDishes,
           faker.number.int({ min: 1, max: 3 }),
         )
 
-        // Generate order data
         const temp_order_items = []
         const orderTotal = selectedDishes.reduce((sum, dish) => {
           const quantity = faker.number.int({ min: 1, max: 5 })
@@ -63,7 +56,10 @@ module.exports = {
           user_id: user.user_id,
           restaurant_id: restaurant.restaurant_id,
           order_total: orderTotal.toFixed(2),
-          order_time: faker.date.recent(300),
+          order_time: faker.date.between({
+            from: '2023-01-01T00:00:00.000Z',
+            to: '2024-10-10T00:00:00.000Z',
+          }),
           order_status: faker.helpers.arrayElement(orderStatuses),
           delivery_location: faker.location.nearbyGPSCoordinate().join(','),
           delivery_address_line1: faker.location.streetAddress(),
@@ -77,7 +73,6 @@ module.exports = {
     })
 
     await queryInterface.bulkInsert('order', orders)
-    console.log('orders inserted')
 
     const insertedOrderIds = await queryInterface.sequelize.query(
       'SELECT order_id FROM `snackaroo-db`.order',
@@ -86,15 +81,11 @@ module.exports = {
       },
     )
 
-    console.log('insertedOrderIds', insertedOrderIds.length)
-
     for (let i = 0; i < insertedOrderIds.length; i++) {
       orderItems[i].forEach(orderItem => {
         orderItem.order_id = insertedOrderIds[i].order_id
       })
     }
-
-    console.log('orderItems', orderItems.flat()[1])
 
     await queryInterface.bulkInsert('order_item', orderItems.flat())
   },
