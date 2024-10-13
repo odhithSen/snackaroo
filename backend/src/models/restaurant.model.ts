@@ -75,14 +75,15 @@ export class Restaurant
 }
 
 export interface RestaurantCreate {
+  restaurant_id: number
   name: string
-  thumbnail_image_url?: string
-  tag_line?: string
-  location?: string
-  address?: string
-  contact_number?: string
-  hygiene_rating?: number
-  notes?: string
+  thumbnail_image_url: string
+  tag_line: string
+  location: string
+  address: string
+  contact_number: string
+  hygiene_rating: number
+  notes: string
 }
 
 export interface RestaurantUpdate {

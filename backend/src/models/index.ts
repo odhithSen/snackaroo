@@ -8,6 +8,7 @@ import { RestaurantTime } from './restaurant_time.model'
 import { RestaurantDishItem } from './restaurant-dish-item.model'
 import { Order } from './order.model'
 import { OrderItem } from './order_item.model'
+import { RestaurantAdmin } from './restaurant_admin.model'
 
 const sequelize = new Sequelize({
   dialect: 'mysql',
@@ -25,6 +26,7 @@ const sequelize = new Sequelize({
     RestaurantDishItem,
     Order,
     OrderItem,
+    RestaurantAdmin,
   ],
 })
 
