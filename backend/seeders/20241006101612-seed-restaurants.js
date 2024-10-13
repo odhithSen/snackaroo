@@ -7,7 +7,7 @@ module.exports = {
     const restaurants = []
     const restaurantNames = new Set()
 
-    while (restaurants.length < 20) {
+    while (restaurants.length < 100) {
       let name = faker.company.name()
 
       if (restaurantNames.has(name)) {

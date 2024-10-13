@@ -14,9 +14,18 @@ module.exports = {
         updatedAt: new Date(),
         profile_picture_url: 'https://avatar.iran.liara.run/public/37',
       },
+      {
+        first_name: 'John',
+        last_name: 'Doe',
+        email: 'test2@dev.com',
+        contact_number: '1234567890',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        profile_picture_url: 'https://avatar.iran.liara.run/public/37',
+      },
     ]
 
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < 200; i++) {
       users.push({
         first_name: faker.name.firstName(),
         last_name: faker.name.lastName(),

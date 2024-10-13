@@ -32,7 +32,7 @@ module.exports = {
       const assignedCategories = new Set()
 
       assignedCategories.add(shuffledCategories[0])
-      const additionalCategories = faker.number.int({ min: 1, max: 3 })
+      const additionalCategories = faker.number.int({ min: 3, max: 6 })
 
       for (let i = 1; i <= additionalCategories; i++) {
         assignedCategories.add(shuffledCategories[i])

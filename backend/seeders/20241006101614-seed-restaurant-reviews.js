@@ -29,7 +29,7 @@ module.exports = {
       return { restaurantId, reviewerId }
     }
 
-    for (let i = 0; i < 100; i++) {
+    for (let i = 0; i < 2000; i++) {
       const { restaurantId, reviewerId } = generateUniquePair()
 
       reviews.push({

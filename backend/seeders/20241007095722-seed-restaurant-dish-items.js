@@ -16,10 +16,18 @@ module.exports = {
       { type: Sequelize.QueryTypes.SELECT },
     )
 
+    const dishNameSet = new Set()
     const restaurantDishItems = []
 
     for (const category of dishCategories) {
-      for (let i = 0; i < 2; i++) {
+      for (let i = 0; i < 5; i++) {
+        let dishName = faker.commerce.productName()
+        while (dishNameSet.has(dishName)) {
+          dishName = faker.commerce.productName()
+          continue
+        }
+        dishNameSet.add(dishName)
+
         restaurantDishItems.push({
           restaurant_id: category.restaurant_id,
           dish_category_id: category.dish_category_id,
@@ -28,7 +36,7 @@ module.exports = {
             width: 320,
             height: 320,
           }),
-          dish_name: faker.commerce.productName(),
+          dish_name: dishName,
           dish_description: faker.lorem.sentence(),
           calories: faker.number.int({ min: 100, max: 1000 }),
           base_price: faker.commerce.price(5, 50, 2),
@@ -39,7 +47,11 @@ module.exports = {
       }
     }
 
-    await queryInterface.bulkInsert('restaurant_dish_item', restaurantDishItems, {})
+    try {
+      await queryInterface.bulkInsert('restaurant_dish_item', restaurantDishItems, {})
+    } catch (error) {
+      console.log(error)
+    }
   },
 
   async down(queryInterface, Sequelize) {
