@@ -5,7 +5,9 @@ import addFormats from 'ajv-formats'
 import {
   addDishCategory,
   addDishItem,
+  getOrderByRestaurantId,
   getRestaurantIdByAdmin,
+  getRestaurantOrdersByStatus,
   updateOrderStatus,
 } from '../services/restaurant-admin.service'
 import { RestaurantDishItemCreate } from '../models/restaurant-dish-item.model'
@@ -13,6 +15,8 @@ import { RestaurantDishCategoryCreate } from '../models/restaurant_dish_category
 import { OrderStatus } from '../enums/order-status'
 import { get } from 'http'
 import { getOrderByOrderId } from '../services/user.service'
+import { PaginationQuery } from '../models/query-interface'
+import { validatePaginationQuery } from '../utils/pagination-query-validation'
 
 const ajv = new Ajv()
 addFormats(ajv)
@@ -178,5 +182,41 @@ router.patch('/order', async (req: Request, res: Response, next: NextFunction) =
     next(error)
   }
 })
+
+router.get(
+  '/orders',
+  async (
+    req: Request<{}, {}, {}, PaginationQuery & { status?: string }>,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    const restaurant_admin = req.user.user_id
+    try {
+      const paginationValues = validatePaginationQuery(req.query)
+      const { status } = req.query
+
+      if (status && !Object.values(OrderStatus).includes(status as OrderStatus)) {
+        throw new HttpException(400, 'Invalid order status')
+      }
+
+      const restaurant = await getRestaurantIdByAdmin(restaurant_admin)
+
+      let orders
+      if (status) {
+        orders = await getRestaurantOrdersByStatus(
+          restaurant.restaurant_id,
+          status,
+          paginationValues,
+        )
+      } else {
+        orders = await getOrderByRestaurantId(restaurant.restaurant_id, paginationValues)
+      }
+
+      res.status(200).json({ status: 'success', orders })
+    } catch (error) {
+      next(error)
+    }
+  },
+)
 
 export default router

@@ -12,6 +12,7 @@ import {
   RestaurantDishCategoryCreate,
   RestaurantDishCategoryRead,
 } from '../models/restaurant_dish_category.model'
+import { PaginationValues } from '../utils/pagination-query-validation'
 
 export async function getRestaurantIdByAdmin(id: number): Promise<RestaurantAdminRead> {
   try {
@@ -112,5 +113,40 @@ export async function updateOrderStatus(order_id: number, newStatus: OrderStatus
     }
     console.error('Error updating order status', error)
     throw new HttpException(500, 'Error updating order status')
+  }
+}
+
+export async function getRestaurantOrdersByStatus(
+  restaurantId: number,
+  status: string,
+  paginationValues: PaginationValues,
+): Promise<Order[]> {
+  try {
+    const orders = await Order.findAll({
+      where: { restaurant_id: restaurantId, order_status: status },
+      limit: paginationValues.limit,
+      offset: (paginationValues.page - 1) * paginationValues.limit,
+    })
+    return orders
+  } catch (error) {
+    console.error('Error getting restaurant orders by status', error)
+    throw new HttpException(500, 'Error getting restaurant orders by status')
+  }
+}
+
+export async function getOrderByRestaurantId(
+  restaurantId: number,
+  paginationValues: PaginationValues,
+): Promise<Order[]> {
+  try {
+    const orders = await Order.findAll({
+      where: { restaurant_id: restaurantId },
+      limit: paginationValues.limit,
+      offset: (paginationValues.page - 1) * paginationValues.limit,
+    })
+    return orders
+  } catch (error) {
+    console.error('Error getting restaurant orders', error)
+    throw new HttpException(500, 'Error getting restaurant orders')
   }
 }
