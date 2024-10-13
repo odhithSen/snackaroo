@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, lazy, Suspense } from "react";
 import { PageLayout } from "../components/page-layout";
 import { ArrowLeft, ChevronRight, Info, Star } from "lucide-react";
 import { Button } from "src/components/ui/button";
@@ -12,19 +12,26 @@ import { fetchDishCategories } from "src/slices/dishCategoriesSlice";
 import { RestaurantDishItem } from "src/models/restaurant-dish-item";
 import { BasketItem } from "src/models/basket-item";
 import RestaurantInfoModal from "src/components/modals/restaurant-info-modal";
-import ReviewModal from "src/components/modals/review-modal";
+// import ReviewModal from "src/components/modals/review-modal";
 import { useApi } from "src/hooks/useApi";
 import { PageLoader } from "src/components/page-loader";
 import { ReviewsMetaData } from "src/models/restaurant-review";
 import Swal from "sweetalert2";
+import { useLocalStorage } from "usehooks-ts";
 
 export const RestaurantPage: React.FC = () => {
   const navigate = useNavigate();
   const { restaurantId } = useParams();
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
-  const [basketItems, setBasketItems] = useState<BasketItem[]>([]);
   const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+
+  const [basketItems, setBasketItems] = useLocalStorage<BasketItem[]>(
+    `basket_${restaurantId}`,
+    []
+  );
+
+  const ReviewModal = lazy(() => import("src/components/modals/review-modal"));
 
   const dispatch = useDispatch<AppDispatch>();
 
@@ -63,10 +70,6 @@ export const RestaurantPage: React.FC = () => {
         return [...prevItems, { dishItem, quantity }];
       }
     });
-  };
-
-  const clearBasket = () => {
-    setBasketItems([]);
   };
 
   const handleCategoryClick = (categoryId: string) => {
@@ -330,7 +333,7 @@ export const RestaurantPage: React.FC = () => {
           </div>
 
           <div className="grow mt-8">
-            <Basket basketItems={basketItems} clearBasket={clearBasket} />
+            <Basket restaurantId={restaurantId ?? ""} />
           </div>
         </div>
         {restaurant && (
@@ -340,13 +343,16 @@ export const RestaurantPage: React.FC = () => {
             info={restaurant}
           />
         )}
-        {restaurant && (
-          <ReviewModal
-            isOpen={isReviewModalOpen}
-            onClose={() => setIsReviewModalOpen(false)}
-            restaurantId={restaurant.restaurant_id}
-          />
-        )}
+        {restaurant && // Lazy load review modal
+          isReviewModalOpen && (
+            <Suspense fallback={<PageLoader />}>
+              <ReviewModal
+                isOpen={isReviewModalOpen}
+                onClose={() => setIsReviewModalOpen(false)}
+                restaurantId={restaurant.restaurant_id}
+              />
+            </Suspense>
+          )}
       </>
     </PageLayout>
   );

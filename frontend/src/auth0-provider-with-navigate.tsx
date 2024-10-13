@@ -13,8 +13,7 @@ export const Auth0ProviderWithNavigate = ({
   const navigate = useNavigate();
 
   const onRedirectCallback = (appState?: AppState) => {
-    // navigate(appState?.returnTo || window.location.pathname);
-    navigate("/register");
+    navigate(appState?.returnTo || "/register");
   };
 
   return (

@@ -10,6 +10,12 @@ import { Button } from "./ui/button";
 import { Trash2, ChevronRight, HelpCircle, ShoppingBasket } from "lucide-react";
 import { ScrollArea } from "./ui/scroll-area";
 import { BasketItem } from "src/models/basket-item";
+import { useLocalStorage } from "usehooks-ts";
+import { useAuth0 } from "@auth0/auth0-react";
+import { apiCall } from "src/utils/api-call";
+import Swal from "sweetalert2";
+import { OrderRequest } from "src/models/order-request";
+import { useAccessToken } from "src/hooks/useAccessToken";
 
 interface Fee {
   name: string;
@@ -17,12 +23,19 @@ interface Fee {
 }
 
 interface BasketProps {
-  basketItems: BasketItem[];
-  clearBasket: () => void;
+  restaurantId: string;
 }
 
-export default function Basket({ basketItems, clearBasket }: BasketProps) {
+export default function Basket({ restaurantId }: BasketProps) {
+  const { isAuthenticated, loginWithRedirect } = useAuth0();
+  const { accessToken } = useAccessToken();
+
+  const [basketItems, setBasketItems] = useLocalStorage<BasketItem[]>(
+    `basket_${restaurantId}`,
+    []
+  );
   const [riderTip, setRiderTip] = React.useState(0);
+  const [isOrderLoading, setIsOrderLoading] = React.useState(false);
 
   const fees: Fee[] = [
     { name: "Service fee", amount: 0.0 },
@@ -37,6 +50,61 @@ export default function Basket({ basketItems, clearBasket }: BasketProps) {
   const feesTotal = fees.reduce((total, fee) => total + fee.amount, 0);
   const orderTotal = basketSubtotal + feesTotal + riderTip;
   const isBasketEmpty = basketItems.length === 0;
+
+  const clearBasket = () => {
+    setBasketItems([]);
+  };
+
+  async function onOrderClick() {
+    if (!isAuthenticated) {
+      await loginWithRedirect({
+        appState: {
+          returnTo: `/register?returnTo=${window.location.pathname}`,
+        },
+        authorizationParams: {
+          prompt: "login",
+        },
+      });
+      return;
+    }
+    console.log("Placing order...");
+    setIsOrderLoading(true);
+    try {
+      const orderRequest: OrderRequest = {
+        restaurant_id: parseInt(restaurantId),
+        delivery_location: "home",
+        delivery_address_line1: "123 Fake St",
+        delivery_address_line2: "",
+        order_items: basketItems.map((item) => ({
+          dish_id: item.dishItem.dish_id,
+          quantity: item.quantity,
+        })),
+      };
+      await apiCall({
+        endpoint: "user/order",
+        method: "POST",
+        bodyData: orderRequest,
+        accessToken,
+      });
+      setBasketItems([]);
+      Swal.fire({
+        title: "Order placed!",
+        text: "Your order has been placed successfully",
+        icon: "success",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+    } catch (error) {
+      console.error("Error placing order", error);
+      Swal.fire({
+        title: "Error!",
+        text: "An Error Occurred while placing order",
+        icon: "error",
+      });
+    } finally {
+      setIsOrderLoading(false);
+    }
+  }
 
   return (
     <Card className="w-full max-w-md mx-auto h-[600px] flex flex-col rounded-sm">
@@ -186,9 +254,11 @@ export default function Basket({ basketItems, clearBasket }: BasketProps) {
               ? "bg-gray-300 text-gray-500"
               : "bg-teal-500 hover:bg-teal-600 text-white"
           }`}
-          disabled={isBasketEmpty}
+          disabled={isBasketEmpty || isOrderLoading}
+          loading={isOrderLoading}
+          onClick={onOrderClick}
         >
-          Go to checkout
+          {isAuthenticated ? "Place order" : "Sign in and order"}
         </Button>
       </CardFooter>
     </Card>

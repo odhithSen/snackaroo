@@ -29,7 +29,8 @@ const apiCall = async ({
   try {
     return await axios(config);
   } catch (error) {
-    return error as AxiosError;
+    // eslint-disable-next-line no-throw-literal
+    throw error as AxiosError;
   }
 };
 

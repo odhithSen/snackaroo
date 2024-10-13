@@ -7,6 +7,7 @@ import { ScrollArea } from "../ui/scroll-area";
 import { RestaurantReview } from "src/models/restaurant-review";
 import { useApi } from "src/hooks/useApi";
 import Swal from "sweetalert2";
+import { PageLoader } from "../page-loader";
 // import { PageLoader } from "../page-loader";
 
 interface ReviewModalProps {
@@ -26,9 +27,9 @@ const ReviewModal: React.FC<ReviewModalProps> = ({
     dependencies: [],
   });
 
-  // if (reviewRequest.loading) {
-  //   return <PageLoader />;
-  // }
+  if (reviewRequest.loading) {
+    return <div />;
+  }
 
   if (reviewRequest.error) {
     console.error("Error getting reviews", reviewRequest.error.message);

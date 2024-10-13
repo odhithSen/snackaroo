@@ -1,22 +1,11 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import { config } from "src/config";
 
 const useAccessToken = () => {
-  const { loginWithRedirect, getAccessTokenSilently } = useAuth0();
+  const { getAccessTokenSilently } = useAuth0();
 
   const [accessToken, setAccessToken] = useState<string>("");
-
-  const redirectToLogin = useCallback(async () => {
-    await loginWithRedirect({
-      appState: {
-        returnTo: window.location.pathname,
-      },
-      authorizationParams: {
-        prompt: "login",
-      },
-    });
-  }, [loginWithRedirect]);
 
   useEffect(() => {
     const getAccessToken = async () => {
@@ -29,16 +18,13 @@ const useAccessToken = () => {
             },
           })
         );
-      } catch {
-        console.error(
-          "Get Access Token: Error getting access token. Redirecting to login..."
-        );
+      } catch (error) {
+        console.error("Get Access Token: Error getting access token.", error);
         setAccessToken("");
-        redirectToLogin();
       }
     };
     getAccessToken();
-  }, [getAccessTokenSilently, redirectToLogin]);
+  }, [getAccessTokenSilently]);
 
   return { accessToken };
 };

@@ -11,7 +11,7 @@ export const NavBar: React.FC = () => {
   const handleLogin = async () => {
     await loginWithRedirect({
       appState: {
-        returnTo: window.location.pathname, //"/profile",
+        returnTo: `/register?returnTo=${window.location.pathname}`,
       },
       authorizationParams: {
         prompt: "login",

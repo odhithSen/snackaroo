@@ -32,7 +32,7 @@ const useApi = ({
   const redirectToLogin = async () => {
     await loginWithRedirect({
       appState: {
-        returnTo: window.location.pathname,
+        returnTo: `/register?returnTo=${window.location.pathname}`,
       },
       authorizationParams: {
         prompt: "login",

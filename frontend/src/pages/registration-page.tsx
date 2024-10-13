@@ -12,8 +12,9 @@ import { PageFooter } from "src/components/page-footer";
 import { useAccessToken } from "src/hooks/useAccessToken";
 import { apiCall } from "src/utils/api-call";
 import { useApi } from "src/hooks/useApi";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { PageLoader } from "src/components/page-loader";
+import Swal from "sweetalert2";
 
 interface FormData {
   first_name: string;
@@ -32,6 +33,7 @@ interface FormErrors {
 export const RegistrationPage: React.FC = () => {
   const { accessToken } = useAccessToken();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const [formData, setFormData] = useState<FormData>({
     first_name: "",
@@ -41,14 +43,15 @@ export const RegistrationPage: React.FC = () => {
   });
 
   const [errors, setErrors] = useState<FormErrors>({});
+  const [registerLoading, setRegisterLoading] = useState(false);
 
   const userInfo = useApi({
     endpoint: "user-info/me",
   });
-  // TODO: return back to the original page if user is already registered
   if (userInfo.data) {
     console.log("User already registered:", userInfo.data);
-    navigate("/");
+    const returnToUrl = searchParams.get("returnTo") || "/";
+    navigate(returnToUrl);
   }
   if (userInfo.loading) {
     return <PageLoader />;
@@ -99,7 +102,8 @@ export const RegistrationPage: React.FC = () => {
       registerData.profile_picture_url = `https://avatar.iran.liara.run/username?username=${registerData.first_name}+${registerData.last_name}`;
       console.log("Form submitted:", registerData);
       try {
-        const res = await apiCall({
+        setRegisterLoading(true);
+        await apiCall({
           endpoint: "user-info/create",
           method: "POST",
           bodyData: registerData,
@@ -111,10 +115,27 @@ export const RegistrationPage: React.FC = () => {
           contact_number: "",
           profile_picture_url: "",
         });
-        // TODO: show success message and navigate to the original page
-        navigate("/");
+        Swal.fire({
+          title: "Registration success!",
+          text: "You will be redirected...",
+          icon: "success",
+          showConfirmButton: false,
+          timer: 1500,
+        });
+
+        setTimeout(() => {
+          const returnToUrl = searchParams.get("returnTo") || "/";
+          navigate(returnToUrl);
+        }, 1500);
       } catch (error) {
         console.error("Error registering user:", error);
+        Swal.fire({
+          title: "Error!",
+          text: "An Error Occurred while registering user",
+          icon: "error",
+        });
+      } finally {
+        setRegisterLoading(false);
       }
     }
   };
@@ -231,6 +252,8 @@ export const RegistrationPage: React.FC = () => {
               <Button
                 type="submit"
                 className="w-full bg-teal-500 hover:bg-teal-600 text-white"
+                loading={registerLoading}
+                disabled={registerLoading}
               >
                 Register
               </Button>
