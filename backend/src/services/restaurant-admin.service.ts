@@ -5,6 +5,11 @@ import {
   RestaurantDishItemRead,
 } from '../models/restaurant-dish-item.model'
 import { RestaurantAdmin, RestaurantAdminRead } from '../models/restaurant_admin.model'
+import {
+  RestaurantDishCategory,
+  RestaurantDishCategoryCreate,
+  RestaurantDishCategoryRead,
+} from '../models/restaurant_dish_category.model'
 
 export async function getRestaurantIdByAdmin(id: number): Promise<RestaurantAdminRead> {
   try {
@@ -59,6 +64,33 @@ export async function addDishItem(
       throw new HttpException(400, 'Invalid dish details')
     } else {
       throw new HttpException(500, 'Error saving dish item')
+    }
+  }
+}
+
+export async function addDishCategory(
+  newDishCategory: RestaurantDishCategoryCreate,
+): Promise<RestaurantDishCategoryRead> {
+  try {
+    const dishCategory = await RestaurantDishCategory.create(newDishCategory)
+
+    const tempDishCategory: RestaurantDishCategoryRead = {
+      dish_category_id: dishCategory.dish_category_id,
+      restaurant_id: dishCategory.restaurant_id,
+      dish_category_name: dishCategory.dish_category_name,
+    }
+
+    return tempDishCategory
+  } catch (error) {
+    console.error('Error saving dish category', error)
+    // @ts-ignore
+    if (error.name === 'SequelizeUniqueConstraintError') {
+      throw new HttpException(400, 'Dish category already exists')
+      // @ts-ignore
+    } else if (error.name === 'ValidationError') {
+      throw new HttpException(400, 'Invalid dish category details')
+    } else {
+      throw new HttpException(500, 'Error saving dish category')
     }
   }
 }
