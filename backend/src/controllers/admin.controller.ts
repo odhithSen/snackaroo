@@ -95,7 +95,7 @@ router.post('/restaurant', async (req: Request, res: Response, next: NextFunctio
 
     const restaurantAdmin = await addRestaurantAdmin(newRestaurantAdmin)
 
-    res.status(201).json({ status: 'success', newRestaurant })
+    res.status(201).json({ status: 'success', restaurant })
   } catch (error) {
     next(error)
   }
