@@ -7,6 +7,7 @@ import {
   addDishItem,
   getAverageOrderValue,
   getOrderByRestaurantId,
+  getOrdersByDateRange,
   getRestaurantIdByAdmin,
   getRestaurantOrdersByStatus,
   getSalesReport,
@@ -317,6 +318,33 @@ router.get(
       )
 
       res.status(200).json({ status: 'success', averageOrderValue })
+    } catch (error) {
+      next(error)
+    }
+  },
+)
+
+router.get(
+  '/reports/orders',
+  async (
+    req: Request<{}, {}, {}, { from?: string; to?: string; status?: string }>,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    const restaurant_admin = req.user.user_id
+    try {
+      const { from, to, status } = req.query
+      const { fromDate, toDate } = validateDateRange(from, to)
+
+      if (!status || !Object.values(OrderStatus).includes(status as OrderStatus)) {
+        throw new HttpException(400, 'Invalid order status')
+      }
+
+      const restaurant = await getRestaurantIdByAdmin(restaurant_admin)
+
+      const orders = await getOrdersByDateRange(restaurant.restaurant_id, fromDate, toDate, status)
+
+      res.status(200).json({ status: 'success', orders })
     } catch (error) {
       next(error)
     }

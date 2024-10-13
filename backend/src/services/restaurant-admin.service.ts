@@ -317,3 +317,29 @@ export async function getAverageOrderValue(
     throw new HttpException(500, `Error getting average order value report`)
   }
 }
+
+// Get orders between provided dates for a restaurant filleted by status
+export async function getOrdersByDateRange(
+  restaurantId: number,
+  fromDate: Date,
+  toDate: Date,
+  status: string,
+): Promise<any> {
+  try {
+    const [results, metadata] = await sequelize.query(
+      `
+     SELECT *
+        FROM \`order\` O
+        WHERE
+        O.order_status = '${status}'
+        AND O.restaurant_id  = ${restaurantId}
+        AND O.order_time BETWEEN '${fromDate.toISOString()}' AND '${toDate.toISOString()}'; 
+        `,
+    )
+
+    return results
+  } catch (error) {
+    console.error(`Error getting order data report`, error)
+    throw new HttpException(500, `Error getting order data report`)
+  }
+}
