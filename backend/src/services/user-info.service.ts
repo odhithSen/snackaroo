@@ -2,10 +2,15 @@ import HttpException from '../models/http-exception.model'
 import { User, UserCreate, UserRead } from '../models/user.model'
 
 export async function getUserByEmail(email: string): Promise<User | null> {
-  return await User.findOne({ where: { email } })
+  try {
+    return await User.findOne({ where: { email } })
+  } catch (error) {
+    console.error('Error getting user by email', error)
+    throw new HttpException(500, 'Error getting user by email')
+  }
 }
 
-export async function addUser(user: UserCreate): Promise<User | HttpException> {
+export async function addUser(user: UserCreate): Promise<User> {
   try {
     const newUser = User.build(user)
     return await newUser.save()

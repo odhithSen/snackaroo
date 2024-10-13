@@ -18,16 +18,12 @@ const router = Router()
 router.get(
   '/restaurants',
   async (req: Request<{}, {}, {}, PaginationQuery>, res: Response, next: NextFunction) => {
-    const paginationValues = validatePaginationQuery(req.query)
-    if (paginationValues instanceof HttpException) {
-      next(paginationValues)
-    } else {
-      try {
-        const restaurants = await getRestaurants(paginationValues)
-        res.json({ status: 'success', restaurants })
-      } catch (error) {
-        next(error)
-      }
+    try {
+      const paginationValues = validatePaginationQuery(req.query)
+      const restaurants = await getRestaurants(paginationValues)
+      res.json({ status: 'success', restaurants })
+    } catch (error) {
+      next(error)
     }
   },
 )
@@ -55,29 +51,24 @@ router.get(
     res: Response,
     next: NextFunction,
   ) => {
-    const paginationValues = validatePaginationQuery(req.query)
-    const { category } = req.query
-
-    if (paginationValues instanceof HttpException) {
-      next(paginationValues)
-    } else {
-      try {
-        const restaurantId = parseInt(req.params.restaurantId)
-        if (isNaN(restaurantId)) {
-          throw new HttpException(400, 'Invalid restaurant id')
-        }
-        let dishes
-
-        if (category) {
-          dishes = await getDishesByCategory(restaurantId, paginationValues, category)
-        } else {
-          dishes = await getDishesByRestaurantId(restaurantId, paginationValues)
-        }
-
-        res.json({ status: 'success', dishes })
-      } catch (error) {
-        next(error)
+    try {
+      const paginationValues = validatePaginationQuery(req.query)
+      const { category } = req.query
+      const restaurantId = parseInt(req.params.restaurantId)
+      if (isNaN(restaurantId)) {
+        throw new HttpException(400, 'Invalid restaurant id')
       }
+      let dishes
+
+      if (category) {
+        dishes = await getDishesByCategory(restaurantId, paginationValues, category)
+      } else {
+        dishes = await getDishesByRestaurantId(restaurantId, paginationValues)
+      }
+
+      res.json({ status: 'success', dishes })
+    } catch (error) {
+      next(error)
     }
   },
 )
@@ -121,23 +112,18 @@ router.get(
     res: Response,
     next: NextFunction,
   ) => {
-    const paginationValues = validatePaginationQuery(req.query)
-
-    if (paginationValues instanceof HttpException) {
-      next(paginationValues)
-    } else {
-      try {
-        const restaurantId = parseInt(req.params.restaurantId)
-        if (isNaN(restaurantId)) {
-          throw new HttpException(400, 'Invalid restaurant id')
-        }
-
-        const reviews = await getReviewsByRestaurantId(restaurantId, paginationValues)
-
-        res.json({ status: 'success', reviews })
-      } catch (error) {
-        next(error)
+    try {
+      const paginationValues = validatePaginationQuery(req.query)
+      const restaurantId = parseInt(req.params.restaurantId)
+      if (isNaN(restaurantId)) {
+        throw new HttpException(400, 'Invalid restaurant id')
       }
+
+      const reviews = await getReviewsByRestaurantId(restaurantId, paginationValues)
+
+      res.json({ status: 'success', reviews })
+    } catch (error) {
+      next(error)
     }
   },
 )

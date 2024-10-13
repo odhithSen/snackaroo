@@ -9,13 +9,16 @@ const extractUser = async (req: Request, res: Response, next: NextFunction) => {
     return res.status(401).json({ message: 'User email missing' })
   }
 
-  const user: User | null = await getUserByEmail(req.userEmail)
-  if (!user) {
-    return res.status(401).json({ message: 'User not found' })
+  try {
+    const user = await getUserByEmail(req.userEmail)
+    if (!user) {
+      return res.status(401).json({ message: 'User not found' })
+    }
+    req.user = user.dataValues
+    next()
+  } catch (error) {
+    next(error)
   }
-  req.user = user.dataValues
-
-  next()
 }
 
 declare global {

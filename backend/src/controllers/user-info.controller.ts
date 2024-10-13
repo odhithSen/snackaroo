@@ -10,14 +10,18 @@ addFormats(ajv)
 const router = Router()
 
 router.get('/me', async (req: Request, res: Response, next: NextFunction) => {
-  const user: User | null = await getUserByEmail(req.userEmail)
-  if (!user) {
-    return res
-      .status(404)
-      .json({ message: 'User authenticated but not found, please register the user' })
-  }
+  try {
+    const user = await getUserByEmail(req.userEmail)
+    if (!user) {
+      return res
+        .status(404)
+        .json({ message: 'User authenticated but not found, please register the user' })
+    }
 
-  return res.status(200).json({ status: 'success', user })
+    return res.status(200).json({ status: 'success', user })
+  } catch (error) {
+    next(error)
+  }
 })
 
 router.post('/create', async (req: Request, res: Response, next: NextFunction) => {

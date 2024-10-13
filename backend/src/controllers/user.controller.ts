@@ -114,9 +114,7 @@ router.post('/order', async (req: Request, res: Response, next: NextFunction) =>
 
     for (const orderItem of order_items) {
       const dish = await getDishByDishId(orderItem.dish_id)
-      if (dish instanceof HttpException) {
-        throw dish
-      }
+
       const dishItem: OrderItemCreate = {
         order_id: 0,
         dish_id: dish.dish_id,
@@ -140,9 +138,6 @@ router.post('/order', async (req: Request, res: Response, next: NextFunction) =>
     }
 
     const createdOrder = await addOrder(newOrder)
-    if (createdOrder instanceof HttpException) {
-      throw createdOrder
-    }
 
     for (const dishItem of dishItems) {
       dishItem.order_id = createdOrder.order_id
@@ -163,9 +158,7 @@ router.get('/orders/:orderId', async (req: Request, res: Response, next: NextFun
       throw new HttpException(400, 'Invalid order id')
     }
     const order = await getOrderByOrderId(orderId)
-    if (order instanceof HttpException) {
-      throw order
-    }
+
     if (order.user_id !== userId) {
       throw new HttpException(403, 'You are not authorized to view this order')
     }

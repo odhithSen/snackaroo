@@ -5,9 +5,7 @@ import { OrderItem, OrderItemCreate } from '../models/order_item.model'
 import { RestaurantReview, RestaurantReviewCreate } from '../models/restaurant_review.model'
 import { NullishPropertiesOf } from 'sequelize/lib/utils'
 
-export async function addReview(
-  review: RestaurantReviewCreate,
-): Promise<RestaurantReview | HttpException> {
+export async function addReview(review: RestaurantReviewCreate): Promise<RestaurantReview> {
   try {
     const newReview = RestaurantReview.build(review)
     return await newReview.save()
@@ -16,8 +14,12 @@ export async function addReview(
     // @ts-ignore
     if (error.name === 'SequelizeUniqueConstraintError') {
       throw new HttpException(400, 'Review already exists')
+    } else if (
       // @ts-ignore
-    } else if (error.name === 'ValidationError') {
+      error.name === 'ValidationError' ||
+      // @ts-ignore
+      error.name === 'SequelizeForeignKeyConstraintError'
+    ) {
       throw new HttpException(400, 'Invalid review')
     } else {
       throw new HttpException(500, 'Error saving review')
@@ -25,7 +27,7 @@ export async function addReview(
   }
 }
 
-export async function addOrder(order: OrderCreate): Promise<Order | HttpException> {
+export async function addOrder(order: OrderCreate): Promise<Order> {
   try {
     const newOrder = Order.build(order)
     return await newOrder.save()
@@ -43,9 +45,7 @@ export async function addOrder(order: OrderCreate): Promise<Order | HttpExceptio
   }
 }
 
-export async function addOrderItems(
-  orderItems: OrderItemCreate[],
-): Promise<OrderItem[] | HttpException> {
+export async function addOrderItems(orderItems: OrderItemCreate[]): Promise<OrderItem[]> {
   try {
     const newOrderItems = await OrderItem.bulkCreate(
       orderItems as Optional<OrderItem, NullishPropertiesOf<OrderItem>>[],
@@ -65,7 +65,7 @@ export async function addOrderItems(
   }
 }
 
-export async function getOrderByOrderId(orderId: number): Promise<Order | HttpException> {
+export async function getOrderByOrderId(orderId: number): Promise<Order> {
   try {
     const order = await Order.findByPk(orderId)
     if (!order) {
@@ -73,6 +73,9 @@ export async function getOrderByOrderId(orderId: number): Promise<Order | HttpEx
     }
     return order
   } catch (error) {
+    if (error instanceof HttpException) {
+      throw error
+    }
     console.error('Error getting order details', error)
     throw new HttpException(500, 'Error getting order details')
   }

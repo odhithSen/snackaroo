@@ -6,11 +6,9 @@ import {
   RestaurantDishCategory,
   RestaurantDishCategoryRead,
 } from '../models/restaurant_dish_category.model'
-import { RestaurantReview, RestaurantReviewRead } from '../models/restaurant_review.model'
-import { User } from '../models/user.model'
 import { PaginationValues } from '../utils/pagination-query-validation'
 
-export async function getRestaurantById(id: number): Promise<RestaurantRead | HttpException> {
+export async function getRestaurantById(id: number): Promise<RestaurantRead> {
   try {
     const restaurant = await Restaurant.findByPk(id)
     if (restaurant === null) {
@@ -40,7 +38,7 @@ export async function getRestaurantById(id: number): Promise<RestaurantRead | Ht
 
 export async function getRestaurants(
   paginationValues: PaginationValues,
-): Promise<RestaurantRead[] | HttpException> {
+): Promise<RestaurantRead[]> {
   try {
     const restaurants = await Restaurant.findAll({
       limit: paginationValues.limit,
@@ -70,7 +68,7 @@ export async function getRestaurants(
 export async function getDishesByRestaurantId(
   id: number,
   paginationValues: PaginationValues,
-): Promise<RestaurantDishItemRead[] | HttpException> {
+): Promise<RestaurantDishItemRead[]> {
   try {
     const restaurant = await Restaurant.findByPk(id)
     if (restaurant === null) {
@@ -114,7 +112,7 @@ export async function getDishesByCategory(
   id: number,
   paginationValues: PaginationValues,
   category: string,
-): Promise<RestaurantDishItemRead[] | HttpException> {
+): Promise<RestaurantDishItemRead[]> {
   try {
     const restaurant = await Restaurant.findByPk(id)
     if (restaurant === null) {
@@ -161,9 +159,7 @@ export async function getDishesByCategory(
   }
 }
 
-export async function getDishByDishId(
-  dishId: number,
-): Promise<RestaurantDishItemRead | HttpException> {
+export async function getDishByDishId(dishId: number): Promise<RestaurantDishItemRead> {
   try {
     const dish = await RestaurantDishItem.findByPk(dishId)
     if (dish === null) {
@@ -193,7 +189,7 @@ export async function getDishByDishId(
 
 export async function getDishCategoriesByRestaurantId(
   restaurantId: number,
-): Promise<RestaurantDishCategoryRead[] | HttpException> {
+): Promise<RestaurantDishCategoryRead[]> {
   try {
     const restaurant = await Restaurant.findByPk(restaurantId)
     if (restaurant === null) {
@@ -241,7 +237,7 @@ export interface UserReview {
 export async function getReviewsByRestaurantId(
   restaurantId: number,
   paginationValues: PaginationValues,
-): Promise<UserReview[] | HttpException> {
+): Promise<UserReview[]> {
   try {
     const restaurant = await Restaurant.findByPk(restaurantId)
     if (restaurant === null) {
@@ -295,7 +291,7 @@ export interface ReviewsMetadata {
 
 export async function getReviewsMetadataByRestaurantId(
   restaurantId: number,
-): Promise<ReviewsMetadata | HttpException> {
+): Promise<ReviewsMetadata> {
   try {
     const restaurant = await Restaurant.findByPk(restaurantId)
     if (restaurant === null) {
