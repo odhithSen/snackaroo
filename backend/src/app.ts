@@ -4,6 +4,7 @@ import helmet from 'helmet'
 
 import routes from './routes/routes'
 import HttpException from './models/http-exception.model'
+import { UnauthorizedError } from 'express-jwt'
 
 const app = express()
 
@@ -17,18 +18,29 @@ app.get('/', (_req: Request, res: Response) => {
 })
 
 /* eslint-disable */
-app.use((err: Error | HttpException, req: Request, res: Response, next: NextFunction) => {
-  // @ts-ignore
-  if (err && err.errorCode) {
+app.use(
+  (
+    err: Error | HttpException | UnauthorizedError,
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    if (err instanceof UnauthorizedError) {
+      res.status(401).json({ status: 'error', message: err.message })
+      return
+    }
     // @ts-ignore
-    res.status(err.errorCode).json({ status: 'error', message: err?.message })
-    console.error(err)
-  } else if (err) {
-    res
-      .status(500)
-      .json({ status: 'error', message: err?.message?.toString() || 'Internal server error' })
-    console.error(err)
-  }
-})
+    if (err && err.errorCode) {
+      // @ts-ignore
+      res.status(err.errorCode).json({ status: 'error', message: err?.message })
+      console.error(err)
+    } else if (err) {
+      res
+        .status(500)
+        .json({ status: 'error', message: err?.message?.toString() || 'Internal server error' })
+      console.error(err)
+    }
+  },
+)
 
 export default app
