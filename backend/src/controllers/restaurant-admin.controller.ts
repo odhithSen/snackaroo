@@ -6,9 +6,13 @@ import {
   addDishCategory,
   addDishItem,
   getRestaurantIdByAdmin,
+  updateOrderStatus,
 } from '../services/restaurant-admin.service'
 import { RestaurantDishItemCreate } from '../models/restaurant-dish-item.model'
 import { RestaurantDishCategoryCreate } from '../models/restaurant_dish_category.model'
+import { OrderStatus } from '../enums/order-status'
+import { get } from 'http'
+import { getOrderByOrderId } from '../services/user.service'
 
 const ajv = new Ajv()
 addFormats(ajv)
@@ -124,6 +128,52 @@ router.post('/dish-category', async (req: Request, res: Response, next: NextFunc
     const dishCategory = await addDishCategory(newDishCategory)
 
     res.status(201).json({ status: 'success', dishCategory })
+  } catch (error) {
+    next(error)
+  }
+})
+
+interface OrderUpdateRequestBody {
+  order_id: number
+  order_status: string
+}
+router.patch('/order', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { order_id, order_status } = req.body
+
+    const restaurant_admin = req.user.user_id
+
+    const UpdateOrderSchema: JSONSchemaType<OrderUpdateRequestBody> = {
+      type: 'object',
+      properties: {
+        order_id: { type: 'integer', minimum: 1 },
+        order_status: {
+          type: 'string',
+          enum: Object.values(OrderStatus),
+        },
+      },
+      required: ['order_id', 'order_status'],
+      additionalProperties: false,
+    }
+
+    const validate = ajv.compile(UpdateOrderSchema)
+    const valid = validate(req.body)
+    if (!valid) {
+      console.error(validate.errors)
+      throw new HttpException(400, 'Invalid request body')
+    }
+
+    const restaurant = await getRestaurantIdByAdmin(restaurant_admin)
+
+    const order = await getOrderByOrderId(order_id)
+
+    if (restaurant.restaurant_id !== order.restaurant_id) {
+      throw new HttpException(403, 'Forbidden to update this order')
+    }
+
+    const updatedOrder = await updateOrderStatus(order_id, order_status)
+
+    res.status(200).json({ status: 'success', updatedOrder })
   } catch (error) {
     next(error)
   }

@@ -1,4 +1,6 @@
+import { OrderStatus } from '../enums/order-status'
 import HttpException from '../models/http-exception.model'
+import { Order } from '../models/order.model'
 import {
   RestaurantDishItem,
   RestaurantDishItemCreate,
@@ -92,5 +94,23 @@ export async function addDishCategory(
     } else {
       throw new HttpException(500, 'Error saving dish category')
     }
+  }
+}
+
+export async function updateOrderStatus(order_id: number, newStatus: OrderStatus) {
+  try {
+    const order = await Order.findByPk(order_id)
+    if (!order) {
+      throw new HttpException(404, 'Order not found')
+    }
+    order.order_status = newStatus
+    const updatedOrder = await order.save()
+    return updatedOrder
+  } catch (error) {
+    if (error instanceof HttpException) {
+      throw error
+    }
+    console.error('Error updating order status', error)
+    throw new HttpException(500, 'Error updating order status')
   }
 }
