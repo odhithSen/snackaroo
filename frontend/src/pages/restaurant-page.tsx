@@ -89,7 +89,7 @@ export const RestaurantPage: React.FC = () => {
   }, [dispatch, restaurantId]);
 
   const dishesState = useApi({
-    endpoint: `/public/restaurants/${restaurantId}/dishes`,
+    endpoint: `/public/restaurants/${restaurantId}/dishes?limit=200`,
     isPublic: true,
     dependencies: [restaurantId],
   });
