@@ -93,6 +93,7 @@ export async function getUserOrdersByStatus(
       where: { user_id: userId, order_status: status },
       limit: paginationValues.limit,
       offset: (paginationValues.page - 1) * paginationValues.limit,
+      order: [['order_date', 'DESC']],
     })
     return orders
   } catch (error) {

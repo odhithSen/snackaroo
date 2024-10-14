@@ -90,6 +90,15 @@ You can either use a local MySQL database or start the configured mysql Docker i
     docker compose up
    ```
 
+### Mono-repository Setup
+
+This project uses a mono-repository setup with a shared `node_modules` folder for the frontend and backend. To set up the mono-repository, follow these steps:
+
+1. Configure npm workspace:
+   ```bash
+   npm install
+   ```
+
 ### Backend Setup
 
 1. Navigate to the `backend` directory:
@@ -154,7 +163,7 @@ Database diagrams and DB schema definitions can be found in the [DB schema](http
 
 ## API Documentation
 
-Api documentation generated using Postman and can be accessed by [API documentation](https://documenter.getpostman.com/view/16868257/Tzm6mz1z) file.
+Api documentation generated using Postman and can be accessed by [API documentation](https://documenter.getpostman.com/view/20091662/2sAXxTapib) file.
 
 ## Error Handling and Validation
 

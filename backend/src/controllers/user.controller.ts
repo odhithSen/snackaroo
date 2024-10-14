@@ -61,6 +61,8 @@ router.post('/add-review', async (req: Request, res: Response, next: NextFunctio
       throw new HttpException(400, 'Invalid request body')
     }
 
+    // TODO: Check if user has already ordered from the restaurant
+
     const createdReview = await addReview(newReview)
     res.status(201).json({ status: 'success', data: createdReview })
   } catch (error) {
