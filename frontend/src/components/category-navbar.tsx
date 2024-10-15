@@ -35,12 +35,21 @@ export default function CategoryNavBar() {
   const [activeCategory, setActiveCategory] = useState<string | null>(
     categories[0]?.id
   );
+  const [isMobile, setIsMobile] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const updateCategories = () => {
       if (containerRef.current) {
         const containerWidth = containerRef.current.offsetWidth;
+
+        if (containerWidth < 600) {
+          setIsMobile(true);
+          setVisibleCategories(categories);
+          setHiddenCategories([]);
+          return;
+        }
+
         const moreButtonWidth = 150;
         let availableWidth = containerWidth - moreButtonWidth;
         const visible: Category[] = [];
@@ -97,7 +106,7 @@ export default function CategoryNavBar() {
 
   return (
     <div ref={containerRef} className=" bg-white z-10 shadow-sm w-full">
-      <nav className="flex items-center justify-start px-4 py-5 sticky top-[69px] border-y border-[#eaeaea] bg-white shadow-sm">
+      <nav className="flex items-center justify-start px-4 py-5 sticky top-[69px] border-y border-[#eaeaea] bg-white shadow-sm overflow-x-auto scrollbar-hide">
         {visibleCategories.map((category) => (
           <Button
             key={category.id}
