@@ -1,5 +1,3 @@
-"use client";
-
 import React, { useState, useEffect, useRef } from "react";
 import { Check, ChevronDown } from "lucide-react";
 import { Button } from "../components/ui/button";
@@ -25,6 +23,7 @@ export default function CategoryNavBar({
   const [activeCategory, setActiveCategory] = useState<number | null>(
     dishCategories[0]?.dish_category_id
   );
+  const [isMobile, setIsMobile] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -34,8 +33,11 @@ export default function CategoryNavBar({
 
         if (containerWidth < 600) {
           setVisibleCategories(dishCategories);
+          setIsMobile(true);
           setHiddenCategories([]);
           return;
+        } else {
+          setIsMobile(false);
         }
 
         const moreButtonWidth = 150;
@@ -65,7 +67,7 @@ export default function CategoryNavBar({
 
   useEffect(() => {
     const handleScroll = () => {
-      const scrollThreshold = 230; // The point where the element should become active (200px from the top)
+      const scrollThreshold = 230; // The point where the element should become active (230px from the top)
 
       dishCategories.forEach((category) => {
         const element = document.getElementById(
@@ -78,13 +80,30 @@ export default function CategoryNavBar({
           }
         }
       });
+      if (isMobile) {
+        let container = document.getElementById("scrollable-div");
+        console.log("container: ", container?.id);
+        let item = document.getElementById(activeCategory?.toString() ?? "");
+        console.log("item: ", item?.id);
+
+        item?.scrollIntoView({
+          behavior: "auto",
+          block: "nearest",
+          inline: "start",
+        });
+        // container?.scrollTo({
+        //   left: item ? item.offsetLeft - 20 : undefined,
+        //   behavior: "smooth",
+        // });
+      }
     };
+
     window.addEventListener("scroll", handleScroll);
 
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
-  }, []);
+  }, [activeCategory, dishCategories, isMobile]);
 
   const handleCategoryClick = (categoryId: string) => {
     const element = document.getElementById(`section-${categoryId}`);
@@ -94,8 +113,15 @@ export default function CategoryNavBar({
   };
 
   return (
-    <div ref={containerRef} className=" bg-white z-10 shadow-sm w-full">
-      <nav className="flex items-center justify-start px-4 py-5 sticky top-[69px] border-y border-[#eaeaea] bg-white shadow-sm overflow-x-auto scrollbar-hide">
+    <div
+      ref={containerRef}
+      className="flex bg-white z-10 w-full border-y border-[#eaeaea] shadow-sm"
+    >
+      <div className="pl-4"></div>
+      <nav
+        id="scrollable-div"
+        className="flex items-center justify-start pr-4 py-5 sticky top-[69px] bg-white overflow-x-auto scrollbar-hide"
+      >
         {visibleCategories.map((category) => (
           <Button
             key={category.dish_category_id}

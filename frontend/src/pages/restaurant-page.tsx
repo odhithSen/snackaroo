@@ -1,7 +1,6 @@
 import React, { useEffect, useState, lazy, Suspense } from "react";
 import { PageLayout } from "../components/page-layout";
 import { ArrowLeft, ChevronRight, Info, Star } from "lucide-react";
-import { Button } from "src/components/ui/button";
 import DishCard from "src/components/cards/dish-card";
 import Basket from "src/components/basket";
 import { useNavigate, useParams } from "react-router-dom";
@@ -12,18 +11,17 @@ import { fetchDishCategories } from "src/slices/dishCategoriesSlice";
 import { RestaurantDishItem } from "src/models/restaurant-dish-item";
 import { BasketItem } from "src/models/basket-item";
 import RestaurantInfoModal from "src/components/modals/restaurant-info-modal";
-// import ReviewModal from "src/components/modals/review-modal";
 import { useApi } from "src/hooks/useApi";
 import { PageLoader } from "src/components/page-loader";
 import { ReviewsMetaData } from "src/models/restaurant-review";
 import Swal from "sweetalert2";
 import { useLocalStorage } from "usehooks-ts";
 import CategoryNavbar from "src/components/category-navbar";
+import FoodCarousel from "src/components/food-carousel";
 
 export const RestaurantPage: React.FC = () => {
   const navigate = useNavigate();
   const { restaurantId } = useParams();
-  const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
 
@@ -71,14 +69,6 @@ export const RestaurantPage: React.FC = () => {
         return [...prevItems, { dishItem, quantity }];
       }
     });
-  };
-
-  const handleCategoryClick = (categoryId: string) => {
-    const element = document.getElementById(`section${categoryId}`);
-    if (element) {
-      setActiveCategory(categoryId);
-      element.scrollIntoView({ behavior: "smooth" });
-    }
   };
 
   useEffect(() => {
@@ -236,70 +226,16 @@ export const RestaurantPage: React.FC = () => {
           </div>
         </div>
 
-        {/* temp nav bar */}
         <div className="sticky top-[69px] z-10">
           <CategoryNavbar dishCategories={dishCategories} />
         </div>
 
-        {/* Restaurant category section */}
-        {/* <div className="sticky top-[69px] bg-white z-10 shadow-sm">
-          <nav className="flex items-center justify-start border-y border-[#eaeaea] shadow-sm overflow-x-auto px-4 py-5">
-            {dishCategories?.map((category) => (
-              <div
-                id={"category:" + category.dish_category_id.toString()}
-                key={"category:" + category.dish_category_id}
-              >
-                <Button
-                  id={category.dish_category_name}
-                  variant={
-                    activeCategory === category.dish_category_id.toString()
-                      ? "default"
-                      : "ghost"
-                  }
-                  className={`mx-2 px-4 py-1 h-auto text-sm font-normal rounded-2xl ${
-                    activeCategory === category.dish_category_id.toString()
-                      ? "bg-teal-500 text-white hover:bg-teal-600"
-                      : "text-teal-500 hover:bg-gray-100 hover:text-teal-500"
-                  }`}
-                  onClick={() =>
-                    handleCategoryClick(category.dish_category_id.toString())
-                  }
-                >
-                  {category.dish_category_name}
-                </Button>
-              </div>
-            ))} */}
-
-        {/* {hiddenCategories.length > 0 && (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    className="ml-16 px-4 py-1 h-auto rounded-2xl text-sm font-normal text-teal-500 hover:bg-gray-100 hover:text-teal-500"
-                  >
-                    More <ChevronDown className="ml-2 h-5 w-5 text-teal-500" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  {hiddenCategories.map((category) => (
-                    <>
-                      <DropdownMenuItem
-                        key={category.dish_category_id}
-                        onClick={() =>
-                          handleCategoryClick(category.dish_category_name)
-                        }
-                        className="px-4 py-3 font-normal"
-                      >
-                        {category.dish_category_name}
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                    </>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )} */}
-        {/* </nav> */}
-        {/* </div> */}
+        <div>
+          <h2 className="text-2xl font-bold mt-10 ml-4">
+            Popular with other People
+          </h2>
+          <FoodCarousel />
+        </div>
 
         <div className="flex relative">
           <div className="grow">
