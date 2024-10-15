@@ -18,6 +18,7 @@ import { PageLoader } from "src/components/page-loader";
 import { ReviewsMetaData } from "src/models/restaurant-review";
 import Swal from "sweetalert2";
 import { useLocalStorage } from "usehooks-ts";
+import CategoryNavbar from "src/components/category-navbar";
 
 export const RestaurantPage: React.FC = () => {
   const navigate = useNavigate();
@@ -234,6 +235,9 @@ export const RestaurantPage: React.FC = () => {
             </div>
           </div>
         </div>
+
+        {/* temp nav bar */}
+        <CategoryNavbar />
 
         {/* Restaurant category section */}
         <div className="sticky top-[69px] bg-white z-10 shadow-sm">
