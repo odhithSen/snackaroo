@@ -237,10 +237,12 @@ export const RestaurantPage: React.FC = () => {
         </div>
 
         {/* temp nav bar */}
-        <CategoryNavbar />
+        <div className="sticky top-[69px] z-10">
+          <CategoryNavbar dishCategories={dishCategories} />
+        </div>
 
         {/* Restaurant category section */}
-        <div className="sticky top-[69px] bg-white z-10 shadow-sm">
+        {/* <div className="sticky top-[69px] bg-white z-10 shadow-sm">
           <nav className="flex items-center justify-start border-y border-[#eaeaea] shadow-sm overflow-x-auto px-4 py-5">
             {dishCategories?.map((category) => (
               <div
@@ -266,9 +268,9 @@ export const RestaurantPage: React.FC = () => {
                   {category.dish_category_name}
                 </Button>
               </div>
-            ))}
+            ))} */}
 
-            {/* {hiddenCategories.length > 0 && (
+        {/* {hiddenCategories.length > 0 && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
@@ -296,15 +298,15 @@ export const RestaurantPage: React.FC = () => {
                 </DropdownMenuContent>
               </DropdownMenu>
             )} */}
-          </nav>
-        </div>
+        {/* </nav> */}
+        {/* </div> */}
 
         <div className="flex relative">
           <div className="grow">
             {dishCategories?.map((category) => (
               <div
-                key={`section${category.dish_category_id}`}
-                id={`section${category.dish_category_id}`}
+                key={`section-${category.dish_category_id}`}
+                id={`section-${category.dish_category_id}`}
                 className="p-4 scroll-mt-[140px] mb-5"
               >
                 <h2 className="text-2xl font-bold mb-4">

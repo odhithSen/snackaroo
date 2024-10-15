@@ -7,35 +7,24 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../components/ui/dropdown-menu";
-import { randomBytes } from "crypto";
+import { RestaurantDishCategory } from "src/slices/dishCategoriesSlice";
 
-type Category = {
-  id: string;
-  name: string;
-};
-
-const categories: Category[] = [
-  { id: "create-your-own", name: "Create your own" },
-  { id: "salads", name: "Salads" },
-  { id: "gym-food", name: "Gym food" },
-  { id: "hot-power-bowls", name: "Hot Power Bowls" },
-  { id: "rainbow-wraps", name: "Rainbow Wraps" },
-  { id: "vegan-menu", name: "Vegan Menu" },
-  { id: "snacks-and-sides", name: "Snacks & Sides" },
-  { id: "yoghurt-and-fruit", name: "Yoghurt & fruit" },
-];
-
-export default function CategoryNavBar() {
+interface CategoryNavBarProps {
+  dishCategories: RestaurantDishCategory[];
+}
+export default function CategoryNavBar({
+  dishCategories,
+}: CategoryNavBarProps) {
   const [visibleCategories, setVisibleCategories] =
-    useState<Category[]>(categories);
-  const [hiddenCategories, setHiddenCategories] = useState<Category[]>([]);
-  const [activeCategory, setActiveCategory] = useState<string | null>(
-    categories[0]?.id
+    useState<RestaurantDishCategory[]>(dishCategories);
+  const [hiddenCategories, setHiddenCategories] = useState<
+    RestaurantDishCategory[]
+  >([]);
+  const [activeCategory, setActiveCategory] = useState<number | null>(
+    dishCategories[0]?.dish_category_id
   );
-  const [isMobile, setIsMobile] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -44,19 +33,18 @@ export default function CategoryNavBar() {
         const containerWidth = containerRef.current.offsetWidth;
 
         if (containerWidth < 600) {
-          setIsMobile(true);
-          setVisibleCategories(categories);
+          setVisibleCategories(dishCategories);
           setHiddenCategories([]);
           return;
         }
 
         const moreButtonWidth = 150;
         let availableWidth = containerWidth - moreButtonWidth;
-        const visible: Category[] = [];
-        const hidden: Category[] = [];
+        const visible: RestaurantDishCategory[] = [];
+        const hidden: RestaurantDishCategory[] = [];
 
-        categories.forEach((category) => {
-          const categoryWidth = category.name.length * 14;
+        dishCategories.forEach((category) => {
+          const categoryWidth = category.dish_category_name.length * 16;
           if (availableWidth - categoryWidth >= 0) {
             visible.push(category);
             availableWidth -= categoryWidth;
@@ -67,7 +55,6 @@ export default function CategoryNavBar() {
 
         setVisibleCategories(visible);
         setHiddenCategories(hidden);
-        console.log("Visible: ", visible.length, "Hidden: ", hidden.length);
       }
     };
 
@@ -80,12 +67,14 @@ export default function CategoryNavBar() {
     const handleScroll = () => {
       const scrollThreshold = 230; // The point where the element should become active (200px from the top)
 
-      categories.forEach((category) => {
-        const element = document.getElementById(`section-${category.id}`);
+      dishCategories.forEach((category) => {
+        const element = document.getElementById(
+          `section-${category.dish_category_id}`
+        );
         if (element) {
           const { top, bottom } = element.getBoundingClientRect();
           if (top <= scrollThreshold && bottom > scrollThreshold) {
-            setActiveCategory(category.id);
+            setActiveCategory(category.dish_category_id);
           }
         }
       });
@@ -109,33 +98,39 @@ export default function CategoryNavBar() {
       <nav className="flex items-center justify-start px-4 py-5 sticky top-[69px] border-y border-[#eaeaea] bg-white shadow-sm overflow-x-auto scrollbar-hide">
         {visibleCategories.map((category) => (
           <Button
-            key={category.id}
-            id={category.id}
-            variant={activeCategory === category.id ? "default" : "ghost"}
+            key={category.dish_category_id}
+            id={category.dish_category_id.toString()}
+            variant={
+              activeCategory === category?.dish_category_id
+                ? "default"
+                : "ghost"
+            }
             className={`mx-2 px-4 py-1 h-auto text-sm font-normal rounded-2xl whitespace-nowrap ${
-              activeCategory === category.id
+              activeCategory === category.dish_category_id
                 ? "bg-teal-500 text-white hover:bg-teal-600 font-semibold"
                 : "text-teal-500 hover:bg-gray-100 hover:text-teal-500"
             }`}
-            onClick={() => handleCategoryClick(category.id)}
+            onClick={() =>
+              handleCategoryClick(category.dish_category_id.toString())
+            }
           >
-            {category.name}
+            {category.dish_category_name}
           </Button>
         ))}
         {hiddenCategories.length > 0 && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               {hiddenCategories.some(
-                (category) => category.id === activeCategory
+                (category) => category.dish_category_id === activeCategory
               ) ? (
                 <Button
                   variant="ghost"
                   className="ml-12 px-4 py-1 h-auto rounded-2xl bg-teal-500 text-white font-semibold"
                 >
                   {
-                    categories.find(
-                      (category) => category.id === activeCategory
-                    )?.name
+                    dishCategories.find(
+                      (category) => category.dish_category_id === activeCategory
+                    )?.dish_category_name
                   }
                   <ChevronDown className="ml-2 h-5 w-5" />
                 </Button>
@@ -152,12 +147,14 @@ export default function CategoryNavBar() {
             <DropdownMenuContent>
               {hiddenCategories.map((category) => (
                 <DropdownMenuItem
-                  key={category.id}
-                  onClick={() => handleCategoryClick(category.id)}
+                  key={category.dish_category_id}
+                  onClick={() =>
+                    handleCategoryClick(category.dish_category_id.toString())
+                  }
                   className="px-4 py-3 font-normal min-w-[200px] border-b border-gray-200"
                 >
-                  {category.name}{" "}
-                  {category.id === activeCategory && (
+                  {category.dish_category_name}{" "}
+                  {category.dish_category_id === activeCategory && (
                     <Check className="ml-2 h-5 w-5" />
                   )}
                 </DropdownMenuItem>
@@ -166,21 +163,6 @@ export default function CategoryNavBar() {
           </DropdownMenu>
         )}
       </nav>
-
-      {/* Mock content for demonstration */}
-      {categories.map((category) => (
-        <div
-          key={category.id}
-          id={`section-${category.id}`}
-          className="bg-gray-100 h-[1000px] scroll-mt-[140px] p-4"
-        >
-          <h2 className="text-2xl font-bold mb-4">{category.name}</h2>
-          <p>
-            This is the content for the {category.name} section.{" "}
-            {`section-${category.id}`}
-          </p>
-        </div>
-      ))}
     </div>
   );
 }

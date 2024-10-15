@@ -4,6 +4,7 @@ import { BrowserRouter } from "react-router-dom";
 import { App } from "./app";
 import { Auth0ProviderWithNavigate } from "./auth0-provider-with-navigate";
 import "./index.css";
+import "./tailwind.css";
 import { Provider } from "react-redux";
 import { store } from "./store";
 
