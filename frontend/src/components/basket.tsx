@@ -24,9 +24,10 @@ interface Fee {
 
 interface BasketProps {
   restaurantId: string;
+  isMobile: boolean;
 }
 
-export default function Basket({ restaurantId }: BasketProps) {
+export default function Basket({ restaurantId, isMobile }: BasketProps) {
   const { isAuthenticated, loginWithRedirect } = useAuth0();
   const { accessToken } = useAccessToken();
 
@@ -107,17 +108,25 @@ export default function Basket({ restaurantId }: BasketProps) {
   }
 
   return (
-    <Card className="w-full max-w-md mx-auto h-[600px] flex flex-col rounded-sm">
-      <CardHeader className="flex flex-row justify-between items-center">
-        {!isBasketEmpty && (
-          <>
-            <CardTitle className="text-xl font-semibold">Your order</CardTitle>
-            <Button variant="ghost" size="icon" onClick={clearBasket}>
-              <Trash2 className="h-6 w-6 text-teal-500" />
-            </Button>
-          </>
-        )}
-      </CardHeader>
+    <Card
+      className={`w-full max-w-md mx-auto ${
+        isMobile ? "h-[600px]" : "h-[800px]"
+      } flex flex-col rounded-sm`}
+    >
+      {!isMobile && (
+        <CardHeader className="flex flex-row justify-between items-center">
+          {!isBasketEmpty && (
+            <>
+              <CardTitle className="text-xl font-semibold">
+                Your order
+              </CardTitle>
+              <Button variant="ghost" size="icon" onClick={clearBasket}>
+                <Trash2 className="h-6 w-6 text-teal-500" />
+              </Button>
+            </>
+          )}
+        </CardHeader>
+      )}
 
       <ScrollArea className="flex-grow" type="always">
         <CardContent className="space-y-4 h-full">
@@ -128,8 +137,12 @@ export default function Basket({ restaurantId }: BasketProps) {
             </div>
           ) : (
             <>
-              <div>
-                <h2 className="text-lg font-bold mb-2">Basket</h2>
+              <div className={`${isMobile ? "w-full" : ""}`}>
+                <h2
+                  className={`text-lg font-bold mb-2 ${isMobile ? "py-7" : ""}`}
+                >
+                  Basket
+                </h2>
                 <div className="border border-gray-200 rounded-sm">
                   {basketItems.map((item, index) => (
                     <div

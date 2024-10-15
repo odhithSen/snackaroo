@@ -1,6 +1,14 @@
 import React, { useEffect, useState, lazy, Suspense } from "react";
 import { PageLayout } from "../components/page-layout";
-import { ArrowLeft, ChevronRight, Info, Star } from "lucide-react";
+import {
+  ArrowLeft,
+  ChevronRight,
+  Cross,
+  Info,
+  Star,
+  Trash2,
+  X,
+} from "lucide-react";
 import DishCard from "src/components/cards/dish-card";
 import Basket from "src/components/basket";
 import { useNavigate, useParams } from "react-router-dom";
@@ -18,12 +26,22 @@ import Swal from "sweetalert2";
 import { useLocalStorage } from "usehooks-ts";
 import CategoryNavbar from "src/components/category-navbar";
 import FoodCarousel from "src/components/food-carousel";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "../components/ui/drawer";
+import { Button } from "src/components/ui/button";
 
 export const RestaurantPage: React.FC = () => {
   const navigate = useNavigate();
   const { restaurantId } = useParams();
   const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [isBasketOpen, setIsBasketOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   const [basketItems, setBasketItems] = useLocalStorage<BasketItem[]>(
     `basket_${restaurantId}`,
@@ -78,6 +96,16 @@ export const RestaurantPage: React.FC = () => {
   useEffect(() => {
     dispatch(fetchDishCategories({ restaurantID: Number(restaurantId) }));
   }, [dispatch, restaurantId]);
+
+  useEffect(() => {
+    const checkIfMobile = () => {
+      setIsMobile(window.innerWidth < 960); // TODO: Adjust this value
+    };
+    checkIfMobile();
+    window.addEventListener("resize", checkIfMobile);
+
+    return () => window.removeEventListener("resize", checkIfMobile);
+  }, []);
 
   const dishesState = useApi({
     endpoint: `/public/restaurants/${restaurantId}/dishes?limit=200`,
@@ -275,9 +303,92 @@ export const RestaurantPage: React.FC = () => {
           </div>
 
           <div className="grow mt-8">
-            <Basket restaurantId={restaurantId ?? ""} />
+            <Basket restaurantId={restaurantId ?? ""} isMobile={false} />
           </div>
+
+          {/* Basket drawer */}
+          {isMobile && basketItems.length > 0 && (
+            <div className="fixed bottom-0 left-0 right-0 z-50">
+              <div className="bg-white h-[124px] border-t">
+                <div className=" text-red-700 p-3 flex items-center justify-between">
+                  <div className="flex items-center">
+                    <Info className="w-4 h-4 mr-2" />
+                    <span className="text-sm font-normal pt-1">
+                      Add £12.95 to get 20% off
+                    </span>
+                  </div>
+                </div>
+                <div className="px-3 pb-1">
+                  <div className="h-1 bg-gray-200 w-full rounded-sm mb-2">
+                    <div className="h-full bg-red-700 w-[50%]"></div>
+                  </div>
+                </div>
+                <Drawer open={isBasketOpen} onOpenChange={setIsBasketOpen}>
+                  <DrawerTrigger asChild>
+                    <div className="flex justify-center">
+                      <button className=" w-full mx-5 bg-[#00C2B3] text-white py-[10px] px-4 rounded-md flex items-center justify-between">
+                        <div className="bg-teal-600 rounded-md w-7 h-7 flex items-center justify-center mr-3">
+                          <span className="text-sm font-bold">
+                            {basketItems.length}
+                          </span>
+                        </div>
+                        <div className="font-bold">View basket</div>
+                        <span className="text-base font-semibold">
+                          £
+                          {basketItems
+                            .reduce(
+                              (total, item) =>
+                                total +
+                                item.dishItem.base_price * item.quantity,
+                              0
+                            )
+                            .toFixed(2)}
+                        </span>
+                      </button>
+                    </div>
+                  </DrawerTrigger>
+                  <DrawerContent>
+                    <DrawerHeader>
+                      <DrawerTitle>
+                        <div className="h-14 flex items-center justify-between border-b border-gray-200 shadow-sm p-0">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="mr-2"
+                            onClick={() => setIsBasketOpen(false)}
+                          >
+                            <X className="h-6 w-6 text-teal-500" />
+                          </Button>
+                          <div className="font-semibold">
+                            <div>Your order </div>
+                            <div className="text-sm font-normal text-gray-500">
+                              {restaurant?.name}
+                            </div>
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="mr-2"
+                            onClick={() => setBasketItems([])}
+                          >
+                            <Trash2 className="h-6 w-6 text-teal-500" />
+                          </Button>
+                        </div>
+                      </DrawerTitle>
+                    </DrawerHeader>
+                    <div className="pt-2">
+                      <Basket
+                        restaurantId={restaurantId ?? ""}
+                        isMobile={true}
+                      />
+                    </div>
+                  </DrawerContent>
+                </Drawer>
+              </div>
+            </div>
+          )}
         </div>
+
         {restaurant && (
           <RestaurantInfoModal
             isOpen={isInfoModalOpen}
