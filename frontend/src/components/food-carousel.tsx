@@ -21,80 +21,80 @@ const foodItems: FoodItem[] = [
   },
   {
     id: 2,
-    name: "Chipotle salad wfuhf9fehu weifweufh",
-    calories: 524,
-    price: 11.99,
-    image: "https://loremflickr.com/320/320/food?lock=6513165031846466",
+    name: "Modern Concrete Gloves",
+    calories: 240,
+    price: 5.99,
+    image: "https://loremflickr.com/320/320/food?lock=6513165031846468",
   },
   {
     id: 3,
-    name: "Chipotle salad",
-    calories: 524,
-    price: 11.99,
-    image: "https://loremflickr.com/320/320/food?lock=6902699672035287",
+    name: "Fantastic Frozen Glovesd",
+    calories: 540,
+    price: 10.99,
+    image: "https://loremflickr.com/320/320/food?lock=6902699672035385",
   },
   {
     id: 4,
-    name: "Chipotle salad wfuhf9fehu weifweufh",
-    calories: 524,
-    price: 11.99,
-    image: "https://loremflickr.com/320/320/food?lock=6513165031846466",
+    name: "Ergonomic Concrete Cheese",
+    calories: 400,
+    price: 90.99,
+    image: "https://loremflickr.com/320/320/food?lock=6513165031846463",
   },
   {
     id: 5,
-    name: "Chipotle salad",
-    calories: 524,
-    price: 11.99,
-    image: "https://loremflickr.com/320/320/food?lock=6902699672035287",
+    name: "Refined Fresh Ball",
+    calories: 220,
+    price: 45.99,
+    image: "https://loremflickr.com/320/320/food?lock=6902699672035282",
   },
   {
     id: 6,
-    name: "Chipotle salad wfuhf9fehu weifweufh",
-    calories: 524,
+    name: "Unbranded Granite Bike",
+    calories: 334,
     price: 11.99,
-    image: "https://loremflickr.com/320/320/food?lock=6513165031846466",
+    image: "https://loremflickr.com/320/320/food?lock=6513165031846461",
   },
   {
     id: 7,
-    name: "Chipotle salad",
-    calories: 524,
-    price: 11.99,
-    image: "https://loremflickr.com/320/320/food?lock=6902699672035287",
+    name: "Gorgeous Frozen Keyboard",
+    calories: 555,
+    price: 15.88,
+    image: "https://loremflickr.com/320/320/food?lock=6902699672035289",
   },
   {
     id: 8,
-    name: "Chipotle salad wfuhf9fehu weifweufh",
-    calories: 524,
-    price: 11.99,
-    image: "https://loremflickr.com/320/320/food?lock=6513165031846466",
+    name: "Sleek Steel Table",
+    calories: 800,
+    price: 50.99,
+    image: "https://loremflickr.com/320/320/food?lock=6513165031846464",
   },
   {
     id: 9,
     name: "Chipotle salad",
-    calories: 524,
-    price: 11.99,
-    image: "https://loremflickr.com/320/320/food?lock=6902699672035287",
+    calories: 594,
+    price: 1.99,
+    image: "https://loremflickr.com/320/320/food?lock=6902699672035288",
   },
   {
     id: 10,
-    name: "Chipotle salad wfuhf9fehu weifweufh",
-    calories: 524,
-    price: 11.99,
-    image: "https://loremflickr.com/320/320/food?lock=6513165031846466",
+    name: "Handcrafted Granite Salad",
+    calories: 994,
+    price: 20.99,
+    image: "https://loremflickr.com/320/320/food?lock=6513165031846461",
   },
   {
     id: 11,
     name: "Chipotle salad",
-    calories: 524,
-    price: 11.99,
-    image: "https://loremflickr.com/320/320/food?lock=6902699672035287",
+    calories: 324,
+    price: 10.99,
+    image: "https://loremflickr.com/320/320/food?lock=6902699672035283",
   },
   {
     id: 12,
-    name: "Chipotle salad wfuhf9fehu weifweufh",
-    calories: 524,
-    price: 11.99,
-    image: "https://loremflickr.com/320/320/food?lock=6513165031846466",
+    name: "Recycled Plastic Chips",
+    calories: 724,
+    price: 8.99,
+    image: "https://loremflickr.com/320/320/food?lock=6513165031846469",
   },
 ];
 
@@ -106,7 +106,7 @@ export default function Component() {
   const checkScrollButtons = () => {
     if (carouselRef.current) {
       const { scrollLeft, scrollWidth, clientWidth } = carouselRef.current;
-      setCanScrollLeft(scrollLeft > 0);
+      setCanScrollLeft(scrollLeft > 15);
       setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 1);
     }
   };
@@ -130,7 +130,7 @@ export default function Component() {
       <div className="relative">
         <div
           ref={carouselRef}
-          className="flex overflow-x-scroll md:scrollbar-hide md:overflow-x-auto md:scrollbar-hide md:snap-x md:snap-mandatory"
+          className="flex overflow-x-scroll pb-2 md:scrollbar-hide md:overflow-x-auto md:scrollbar-hide md:snap-x md:snap-mandatory"
           onScroll={checkScrollButtons}
         >
           {foodItems.map((item) => (
