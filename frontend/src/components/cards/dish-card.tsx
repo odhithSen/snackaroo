@@ -40,11 +40,11 @@ export default function DishCard({
         onClick={() => setIsModalOpen(true)}
       >
         <div className="flex-1 min-w-0 mr-4">
-          <h3 className="text-md font-bold text-gray-900 leading-tight">
+          <h3 className="text-md font-bold text-gray-900 leading-tight line-clamp-1 overflow-hidden text-ellipsis">
             {name}
           </h3>
           {isAvailable ? (
-            <p className="mt-1 text-sm text-gray-500 line-clamp-2">
+            <p className="mt-1 text-sm text-gray-500 line-clamp-2 xl:min-h-[40px]">
               {description}
             </p>
           ) : (

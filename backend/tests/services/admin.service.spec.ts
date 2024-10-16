@@ -3,8 +3,8 @@ import { Restaurant } from '../../src/models/restaurant.model'
 import { RestaurantAdmin } from '../../src/models/restaurant_admin.model'
 import HttpException from '../../src/models/http-exception.model'
 
-jest.mock('../../src/models/restaurant.model') // Mock Restaurant model
-jest.mock('../../src/models/restaurant_admin.model') // Mock RestaurantAdmin model
+jest.mock('../../src/models/restaurant.model')
+jest.mock('../../src/models/restaurant_admin.model')
 
 describe('Admin service: addRestaurant', () => {
   afterEach(() => {

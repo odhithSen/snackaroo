@@ -99,7 +99,7 @@ export const RestaurantPage: React.FC = () => {
 
   useEffect(() => {
     const checkIfMobile = () => {
-      setIsMobile(window.innerWidth < 960); // TODO: Adjust this value
+      setIsMobile(window.innerWidth < 1024); // TODO: Adjust this value
     };
     checkIfMobile();
     window.addEventListener("resize", checkIfMobile);
@@ -257,7 +257,6 @@ export const RestaurantPage: React.FC = () => {
         <div className="sticky top-[69px] z-10">
           <CategoryNavbar dishCategories={dishCategories} />
         </div>
-
         <div>
           <h2 className="text-2xl font-bold mt-10 ml-4">
             Popular with other People
@@ -277,32 +276,34 @@ export const RestaurantPage: React.FC = () => {
                   {category.dish_category_name}
                 </h2>
 
-                <div>
+                <div className="xl:flex xl:flex-wrap xl:gap-4 xl:items-stretch xl:justify-stretch">
                   {dishItems
                     .filter(
                       (dish) =>
                         dish.dish_category_id === category.dish_category_id
                     )
                     .map((dish) => (
-                      <DishCard
-                        key={dish.dish_id + Math.random()}
-                        name={dish.dish_name}
-                        description={dish.dish_description}
-                        price={dish?.base_price ?? 0}
-                        imageUrl={dish.thumbnail_image_url}
-                        isAvailable={dish.isAvailable ?? true}
-                        ingredients={dish.ingredients}
-                        onAddToBasket={addToBasket}
-                        calories={dish.calories}
-                        dishItem={dish}
-                      />
+                      <div className="xl:grow xl:shrink xl:w-min xl:min-w-[calc(50%-32px)] xl:max-w-[calc(50%-32px)] self-stretch">
+                        <DishCard
+                          key={dish.dish_id + Math.random()}
+                          name={dish.dish_name}
+                          description={dish.dish_description}
+                          price={dish?.base_price ?? 0}
+                          imageUrl={dish.thumbnail_image_url}
+                          isAvailable={dish.isAvailable ?? true}
+                          ingredients={dish.ingredients}
+                          onAddToBasket={addToBasket}
+                          calories={dish.calories}
+                          dishItem={dish}
+                        />
+                      </div>
                     ))}
                 </div>
               </div>
             ))}
           </div>
 
-          <div className="grow mt-8">
+          <div className="grow shrink mt-8 hidden lg:block sticky top-[141px] z-[9] p-8 max-w-min self-start">
             <Basket restaurantId={restaurantId ?? ""} isMobile={false} />
           </div>
 
@@ -376,7 +377,7 @@ export const RestaurantPage: React.FC = () => {
                         </div>
                       </DrawerTitle>
                     </DrawerHeader>
-                    <div className="pt-2">
+                    <div className="pt-2 flex place-content-center">
                       <Basket
                         restaurantId={restaurantId ?? ""}
                         isMobile={true}

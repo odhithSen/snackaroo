@@ -126,7 +126,7 @@ export default function Component() {
   };
 
   return (
-    <div className="w-full max-w-6xl mx-auto px-4 pb-8 pt-4">
+    <div className="w-full mx-auto px-4 pb-8 pt-4">
       <div className="relative">
         <div
           ref={carouselRef}

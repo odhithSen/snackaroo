@@ -109,9 +109,10 @@ export default function Basket({ restaurantId, isMobile }: BasketProps) {
 
   return (
     <Card
-      className={`w-full max-w-md mx-auto ${
-        isMobile ? "h-[600px]" : "h-[800px]"
-      } flex flex-col rounded-sm`}
+      className={`md:w-[418px] flex flex-col rounded-sm mb-8`}
+      style={{
+        height: isMobile ? "calc(100vh - 170px)" : "calc(100vh - 205px)",
+      }}
     >
       {!isMobile && (
         <CardHeader className="flex flex-row justify-between items-center">
