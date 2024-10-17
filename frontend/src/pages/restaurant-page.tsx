@@ -257,15 +257,16 @@ export const RestaurantPage: React.FC = () => {
         <div className="sticky top-[69px] z-10">
           <CategoryNavbar dishCategories={dishCategories} />
         </div>
-        <div>
-          <h2 className="text-2xl font-bold mt-10 ml-4">
-            Popular with other People
-          </h2>
-          <FoodCarousel />
-        </div>
 
         <div className="flex relative">
           <div className="grow">
+            <div className="w-[calc(100vw-20px)] lg:w-[calc(100vw-520px)]">
+              <h2 className="text-2xl font-bold mt-10 ml-4">
+                Popular with other People
+              </h2>
+              <FoodCarousel />
+            </div>
+
             {dishCategories?.map((category) => (
               <div
                 key={`section-${category.dish_category_id}`}
@@ -283,7 +284,7 @@ export const RestaurantPage: React.FC = () => {
                         dish.dish_category_id === category.dish_category_id
                     )
                     .map((dish) => (
-                      <div className="xl:grow xl:shrink xl:w-min xl:min-w-[calc(50%-32px)] xl:max-w-[calc(50%-32px)] self-stretch">
+                      <div className="xl:grow xl:shrink xl:min-w-[calc(50%-16px)] xl:max-w-[calc(50%-16px)] self-stretch">
                         <DishCard
                           key={dish.dish_id + Math.random()}
                           name={dish.dish_name}
